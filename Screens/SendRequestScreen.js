@@ -1,42 +1,56 @@
-import { StyleSheet, Text, Image, View } from 'react-native'
+import { StyleSheet, Text, Image, TextInput, TouchableOpacity, View } from 'react-native'
 import React from 'react'
+import { useState } from 'react';
 import QRCode from 'react-native-qrcode-svg';
+import { WEBSOCKET_URL } from '../env';
 
 
 const SendRequestScreen = () => {
     const [qrValue, setQRValue] = useState('');
     const [isActive, setIsActive] = useState(false);
+    
+    function generateRandomString(length) {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * charactersLength);
+            result += characters.charAt(randomIndex);
+        }
+        return result;
+    }
+
+    let share_channel_id = generateRandomString(10) 
+    const SHARE_SERVER_URL = `${WEBSOCKET_URL}/ws/socket-server/${share_channel_id}/`
 
     const generateQRCode = () => {
-        if (!qrValue) return;
+        setQRValue(SHARE_SERVER_URL); 
+
+        if (!SHARE_SERVER_URL) { 
+            setIsActive(false); 
+        } 
+        
+        const ws = new WebSocket(SHARE_SERVER_URL);
+
+        ws.onopen = () => {
+        console.log('WebSocket connection opened');
+        // setMessage("Waiting to receive files");
+        };
+
+        ws.onerror = (e) => {
+            Alert.alert(e.message);
+        };
 
         setIsActive(true);
     };
-
+    
 
     return (
         <View style={styles.container}>
             <View style={styles.wrapper}>
                 <Text style={styles.title}>
-                    QR Code Generator
+                    Scan to connect
                 </Text>
-                <Text style={styles.description}>
-                    Paste a URL or enter text to create a QR code
-                </Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter text or URL"
-                    value={qrValue}
-                    onChangeText={handleInputChange}
-                />
-                <TouchableOpacity
-                    style={styles.button}
-                    onPress={generateQRCode}
-                >
-                    <Text style={styles.buttonText}>
-                        Generate QR Code
-                    </Text>
-                </TouchableOpacity>
                 {isActive && (
                     <View style={styles.qrCode}>
                         <QRCode
@@ -47,6 +61,14 @@ const SendRequestScreen = () => {
                         />
                     </View>
                 )}
+                <TouchableOpacity
+                style={styles.button}
+                onPress={generateQRCode}
+                >
+                <Text style={styles.buttonText}>
+                    Regenerate QR Code
+                </Text>
+                </TouchableOpacity>
             </View>
         </View>
     );
@@ -64,7 +86,7 @@ const styles = StyleSheet.create({
     wrapper: {
         maxWidth: 300,
         backgroundColor: '#fff',
-        borderRadius: 7,
+        borderRadius: 16,
         padding: 20,
         shadowColor: 'rgba(0, 0, 0, 0.1)',
         shadowOffset: { width: 0, height: 10 },
@@ -75,22 +97,11 @@ const styles = StyleSheet.create({
         fontSize: 21,
         fontWeight: '500',
         marginBottom: 10,
+        textAlign: "center"
     },
-    description: {
-        color: '#575757',
-        fontSize: 16,
-        marginBottom: 20,
-    },
-    input: {
-        fontSize: 18,
-        padding: 17,
-        borderWidth: 1,
-        borderColor: '#999',
-        borderRadius: 5,
-        marginBottom: 20,
-    },
+
     button: {
-        backgroundColor: '#3498DB',
+        backgroundColor: 'rgb(53,189,153)',
         borderRadius: 5,
         padding: 15,
         alignItems: 'center',
@@ -100,7 +111,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     qrCode: {
-        marginTop: 20,
+        marginBottom: 20,
         alignItems: 'center',
     },
 })

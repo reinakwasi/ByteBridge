@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { MaterialIcons, AntDesign } from '@expo/vector-icons'; // Import AntDesign from expo/vector-icons
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from '@react-navigation/stack';
 
 import PhotoScreen from './Screens/components/PhotoScreen';
@@ -10,17 +10,23 @@ import VideoScreen from './Screens/components/VideoScreen';
 import AudioScreen from './Screens/components/AudioScreen';
 import DocumentScreen from './Screens/components/Document';
 import SendRequestScreen from './Screens/SendRequestScreen';
+import ReceiveScreen from './Screens/ReceiveScreen';
 
 
 
 const Tab = createBottomTabNavigator();
 
 const Stack = createStackNavigator()
-
 const MainTapNavigator = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
+        tabBarStyle: {
+          borderTopWidth: 0,
+          height: 70,
+          paddingTop: 12,
+          paddingBottom: 12
+        },
         headerShown: false,
         tabBarIcon: ({ color, size }) => {
           let iconName;
@@ -56,7 +62,42 @@ const MainTapNavigator = () => {
   )
 }
 
+const ShuffleButtonComponent = () => {
+    const navigation = useNavigation()
+
+    const [showPopUp, setShowPopUp] = useState(false);
+
+    const handleShufflePress = () => {
+      setShowPopUp(!showPopUp);
+    };
+
+    return (
+      <View>
+      <View style={styles.shuffleButtonContainer}>
+        <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
+          <AntDesign name="swap" size={32} color="white" />
+        </TouchableOpacity>
+      </View>
+
+      {showPopUp && (
+        <View style={styles.popUpContainer}>
+          <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("SendRequestScreen")}>
+            <AntDesign name="upload" size={24} color="black" />
+            <Text style={styles.popUpText}>Send</Text>
+          </TouchableOpacity>
+          <View style={styles.spaceBetweenButtons} />
+          <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("ReceiveScreen")}>
+            <AntDesign name="download" size={24} color="black" />
+            <Text style={styles.popUpText}>Receive</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      </View>
+    )
+}
+
 const MainStackNavigator = () => {
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -68,44 +109,33 @@ const MainStackNavigator = () => {
           component={MainTapNavigator}
         />
         <Stack.Screen
+          options={{
+            headerShown: false
+          }}
           name='SendRequestScreen'
           component={SendRequestScreen}
         />
-      </Stack.Navigator>
+
+        <Stack.Screen 
+         options={{
+          headerShown: false
+        }}
+        name='ReceiveScreen'
+        component={ReceiveScreen}
+        />
+      </Stack.Navigator> 
+      
+      <ShuffleButtonComponent />
     </NavigationContainer>
 
   )
 }
 
 const App = () => {
-  const [showPopUp, setShowPopUp] = useState(false);
-
-  const handleShufflePress = () => {
-    setShowPopUp(!showPopUp);
-  };
 
   return (
     <View style={styles.container}>
       <MainStackNavigator />
-      <View style={styles.shuffleButtonContainer}>
-        <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
-          <AntDesign name="swap" size={32} color="white" />
-        </TouchableOpacity>
-      </View>
-
-      {showPopUp && (
-        <View style={styles.popUpContainer}>
-          <TouchableOpacity style={styles.popUpButton}>
-            <AntDesign name="upload" size={24} color="black" />
-            <Text style={styles.popUpText}>Send</Text>
-          </TouchableOpacity>
-          <View style={styles.spaceBetweenButtons} />
-          <TouchableOpacity style={styles.popUpButton}>
-            <AntDesign name="download" size={24} color="black" />
-            <Text style={styles.popUpText}>Receive</Text>
-          </TouchableOpacity>
-        </View>
-      )}
     </View>
   );
 };
@@ -137,7 +167,7 @@ const styles = StyleSheet.create({
   },
   popUpButton: {
     backgroundColor: 'rgb(53,189,153)',
-    padding: 8,
+    padding: 8,// Navigate to SendRequestScreen
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',

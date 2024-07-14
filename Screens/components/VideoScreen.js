@@ -278,6 +278,8 @@ import * as MediaLibrary from 'expo-media-library';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { Video } from 'expo-av';
 import Checkbox from 'expo-checkbox';
+import { useNavigation } from '@react-navigation/native';
+import { AntDesign } from '@expo/vector-icons';
 
 export default function VideoScreen() {
   const [videoFiles, setVideoFiles] = useState([]);
@@ -286,6 +288,40 @@ export default function VideoScreen() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const videoRef = useRef(null);
   const [selectAll, setSelectAll] = useState(false);
+
+  const ShuffleButtonComponent = () => {
+    const navigation = useNavigation()
+
+    const [showPopUp, setShowPopUp] = useState(false);
+
+    const handleShufflePress = () => {
+      setShowPopUp(!showPopUp);
+    };
+
+    return (
+      <View>
+      <View style={styles.shuffleButtonContainer}>
+        <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
+          <AntDesign name="swap" size={32} color="white" />
+        </TouchableOpacity>
+      </View>
+
+      {showPopUp && (
+        <View style={styles.popUpContainer}>
+          <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("SendRequestScreen")}>
+            <AntDesign name="upload" size={24} color="black" />
+            <Text style={styles.popUpText}>Send</Text>
+          </TouchableOpacity>
+          <View style={styles.spaceBetweenButtons} />
+          <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("ReceiveScreen")}>
+            <AntDesign name="download" size={24} color="black" />
+            <Text style={styles.popUpText}>Receive</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      </View>
+    )
+}
 
   useEffect(() => {
     const getPermissions = async () => {
@@ -414,6 +450,7 @@ export default function VideoScreen() {
           </View>
         )}
       </View>
+      <ShuffleButtonComponent />
     </ImageBackground>
   );
 }
@@ -534,6 +571,50 @@ const styles = StyleSheet.create({
   videoPlayer: {
     width: '100%',
     height: '50%',
+  },
+
+
+
+// shuffle buttons
+  shuffleButtonContainer: {
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+  },
+
+  shuffleButton: {
+    backgroundColor: 'rgb(53,189,153)',
+    padding: 10,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  popUpContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    padding: 20,
+    position: 'absolute',
+    bottom: 90,
+    alignSelf: 'center',
+  },
+
+  popUpButton: {
+    backgroundColor: 'rgb(53,189,153)',
+    padding: 8,// Navigate to SendRequestScreen
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  popUpText: {
+    color: 'black',
+    fontSize: 16,
+    marginLeft: 5, // Add some space between icon and text
+  },
+  spaceBetweenButtons: {
+    width: 30,
+    marginEnd: 10,
   },
 });
 
