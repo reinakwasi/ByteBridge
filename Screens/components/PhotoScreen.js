@@ -58,25 +58,28 @@ export default function PhotoScreen() {
   };
   
   const isSelected = (item) => {
-    return selectedPhotos.some(photo => photo.id === item.id);
+    return selectedPhotos.includes(photo => photo.id === item.id);
   };
   
-  const SendFiles = () => {
-    console.log(selectedPhotos)
-    for (var file of selectedPhotos){
-      const fileType = getImageType(file.filename)
-      handleShare(file, fileType)
-    }
-  }
 
   const ShuffleButtonComponent = () => {
     const navigation = useNavigation()
-
     const [showPopUp, setShowPopUp] = useState(false);
 
     const handleShufflePress = () => {
       setShowPopUp(!showPopUp);
     };
+    
+    const handleSendOnPress = () => {
+      if (selectedPhotos.length==0){
+        navigation.navigate("SendRequestScreen")
+      }
+      console.log(selectedPhotos)
+      for (var file of selectedPhotos){
+        handleShare(file, getImageType)
+      }
+      console.log("sending")
+    }
 
     return (
       <View>
@@ -88,7 +91,7 @@ export default function PhotoScreen() {
 
       {showPopUp && (
         <View style={styles.popUpContainer}>
-          <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("SendRequestScreen")}>
+          <TouchableOpacity style={styles.popUpButton} onPress={handleSendOnPress}>
             <AntDesign name="upload" size={24} color="black" />
             <Text style={styles.popUpText}>Send</Text>
           </TouchableOpacity>
@@ -121,8 +124,8 @@ export default function PhotoScreen() {
           <Image source={{ uri: item.uri }} style={styles.thumbnail} />
         </TouchableOpacity>
         <Checkbox
-          value={selectedPhotos.includes(item.id)}
-          onValueChange={() => handleSelectPhoto(item.id)}
+          value={selectedPhotos.includes(item)}
+          onValueChange={() => handleSelectPhoto(item)}
         />
       </View>
     );
@@ -154,7 +157,7 @@ export default function PhotoScreen() {
             <MaterialIcons name="photo" size={24} color={selectAll ? 'white' : 'black'} />
             <Text style={selectAll ? styles.selectButtonTextActive : styles.selectButtonText}>{photoFiles.length}</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={SendFiles} style={[styles.selectButton, selectedPhotos.length > 0 && styles.selectButtonActive]}>
+          <TouchableOpacity style={[styles.selectButton, selectedPhotos.length > 0 && styles.selectButtonActive]}>
             <MaterialIcons name="photo-library" size={24} color={selectedPhotos.length > 0 ? 'white' : 'black'} />
             <Text style={selectedPhotos.length > 0 ? styles.selectButtonTextActive : styles.selectButtonText}>{selectedPhotos.length}</Text>
           </TouchableOpacity>

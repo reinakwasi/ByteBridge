@@ -3,6 +3,8 @@ import React from 'react'
 import { useState } from 'react';
 import QRCode from 'react-native-qrcode-svg';
 import { WEBSOCKET_URL } from '../env';
+import { setItem } from '../utils';
+
 
 
 const SendRequestScreen = () => {
@@ -20,10 +22,14 @@ const SendRequestScreen = () => {
         return result;
     }
 
-    let share_channel_id = generateRandomString(10) 
-    const SHARE_SERVER_URL = `${WEBSOCKET_URL}/ws/socket-server/${share_channel_id}/`
 
-    const generateQRCode = () => {
+    const generateQRCode = async () => {
+        let share_channel_id = generateRandomString(10)
+
+        await setItem("share_channel_id", share_channel_id)
+
+        const SHARE_SERVER_URL = `${WEBSOCKET_URL}/ws/socket-server/${share_channel_id}/`
+
         setQRValue(SHARE_SERVER_URL); 
 
         if (!SHARE_SERVER_URL) { 

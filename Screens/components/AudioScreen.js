@@ -6,6 +6,9 @@ import * as MediaLibrary from 'expo-media-library';
 import { MaterialIcons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { getAudioType } from '../../utils';
+import ProfileButton from '../../components/ProfileComponent';
+import { handleShare } from '../../utils';
 
 
 export default function AudioScreen() {
@@ -26,6 +29,17 @@ export default function AudioScreen() {
       setShowPopUp(!showPopUp);
     };
 
+    const handleSendOnPress = () => {
+      if (selectedFiles.length==0){
+        navigation.navigate("SendRequestScreen")
+      }
+      console.log(selectedFiles)
+      for (var file of selectedFiles){
+        handleShare(file, getAudioType)
+      }
+      console.log("sending")
+    }
+
     return (
       <View>
       <View style={styles.shuffleButtonContainer}>
@@ -36,7 +50,7 @@ export default function AudioScreen() {
 
       {showPopUp && (
         <View style={styles.popUpContainer}>
-          <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("SendRequestScreen")}>
+          <TouchableOpacity style={styles.popUpButton} onPress={handleSendOnPress}>
             <AntDesign name="upload" size={24} color="black" />
             <Text style={styles.popUpText}>Send</Text>
           </TouchableOpacity>
@@ -84,14 +98,19 @@ export default function AudioScreen() {
     await newSound.playAsync();
   };
 
-  const handleSelectFile = (id) => {
-    if (selectedFiles.includes(id)) {
-      setSelectedFiles(selectedFiles.filter(fileId => fileId !== id));
+
+  const handleSelectFile = (item) => {
+    if (isSelected(item)) {
+      setSelectedFiles(selectedFiles.filter(file => file.id !== item.id));
     } else {
-      setSelectedFiles([...selectedFiles, id]);
+      setSelectedFiles([...selectedFiles, item]);
     }
   };
-
+  
+  const isSelected = (item) => {
+    return selectedFiles.includes(photo => photo.id === item.id);
+  };
+  
   const handleToggleSelectAll = () => {
     if (selectAll) {
       setSelectedFiles([]);
@@ -112,8 +131,8 @@ export default function AudioScreen() {
           <Text style={styles.size}>{fileSizeMB}</Text>
         </TouchableOpacity>
         <Checkbox
-          value={selectedFiles.includes(item.id)}
-          onValueChange={() => handleSelectFile(item.id)}
+          value={selectedFiles.includes(item)}
+          onValueChange={() => handleSelectFile(item)}
         />
       </View>
     );
@@ -141,6 +160,7 @@ export default function AudioScreen() {
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
+          <ProfileButton />
         </View>
         <View style={styles.selectAllContainer}>
           <TouchableOpacity style={[styles.selectButton, selectAll && styles.selectButtonActive]} onPress={handleToggleSelectAll}>

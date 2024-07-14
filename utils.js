@@ -1,12 +1,28 @@
 import axios from "axios"
-import { BACKEND_URL } from "../ENV/Global"
-// import {AsyncStorage} from 'react-native';
-import * as MediaLibrary from 'expo-media-library';
-// impo
-// import {sendMessageTo, sendFileTo } from 'react-native-transfer-big-files';
-import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+import { BACKEND_URL } from "./env";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const storage = useAsyncStorage()
+export const setItem = async (key, value) => {
+  try {
+    await AsyncStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.error('Error setting item:', error);
+  }
+};
+
+export const getItem = async (key) => {
+  console.log(key)
+  try {
+    const value = await AsyncStorage.getItem(key);
+    console.log("value", value)
+    return value != null ? JSON.parse(value) : null;
+  } catch (error) {
+    console.error('Error getting item:', error);
+    return null;
+  }
+};
+
+
 
 export const pushToCloud = async (file) => {
     try {
@@ -48,14 +64,17 @@ export const saveToken = async (token) => {
 export const handleShare = async (file, fileType) => {
     console.log(file)
     const shareEndpoint = `${BACKEND_URL}/share/share-file/`;
+    const share_channel_id = await getItem("share_channel_id")
+    console.log("hasj", share_channel_id)
     
     try {
-      const formData = new FormData();
+      const formData = new FormData ();
       formData.append('file', {
         uri: file.uri,
         type: fileType(file.filename),
         name: file.filename,
       });
+      formData.append('share_channel_id', share_channel_id)
   
       const response = await axios.post(shareEndpoint, formData, {
         headers: {
@@ -72,7 +91,7 @@ export const handleShare = async (file, fileType) => {
   };
 
 
-export const getImageType = (filename) => {
+export function getImageType(filename){
     const extension = filename.split('.').pop().toLowerCase();
 
     const mimeTypes = {
