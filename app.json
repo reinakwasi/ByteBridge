@@ -1,9 +1,5 @@
 
 
-
-
-
-
 {
   "expo": {
     "name": "ByteBridge",
@@ -11,27 +7,20 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
     "splash": {
-      "image": "assests/splash.jpg",
-      "resizeMode": "contain"
-      
+      "image": "./assests/splash.jpg",
+      "resizeMode": "cover"
     },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#ffffff"
       },
-      "permissions": [
-        "CAMERA",
-        "INTERNET"
-      ]
+      "package": "com.bytebridge.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"

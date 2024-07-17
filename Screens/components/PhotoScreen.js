@@ -1,11 +1,8 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, FlatList, Image, TextInput, StyleSheet, TouchableOpacity, ImageBackground, PanResponder } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import Checkbox from 'expo-checkbox';
-import { getImageType, handleShare } from '../../utils';
 import { AntDesign } from '@expo/vector-icons';
 import ProfileButton from '../../components/ProfileComponent';
 
@@ -17,8 +14,6 @@ export default function PhotoScreen() {
   const [selectAll, setSelectAll] = useState(false);
   const panResponder = useRef(null);
 
-
-  
   useEffect(() => {
     const getPermissions = async () => {
       const { status } = await MediaLibrary.requestPermissionsAsync();
@@ -56,11 +51,10 @@ export default function PhotoScreen() {
       setSelectedPhotos([...selectedPhotos, item]);
     }
   };
-  
+
   const isSelected = (item) => {
-    return selectedPhotos.includes(photo => photo.id === item.id);
+    return selectedPhotos.some(photo => photo.id === item.id);
   };
-  
 
   const ShuffleButtonComponent = () => {
     const navigation = useNavigation()
@@ -69,13 +63,13 @@ export default function PhotoScreen() {
     const handleShufflePress = () => {
       setShowPopUp(!showPopUp);
     };
-    
+
     const handleSendOnPress = () => {
-      if (selectedPhotos.length==0){
+      if (selectedPhotos.length == 0) {
         navigation.navigate("SendRequestScreen")
       }
       console.log(selectedPhotos)
-      for (var file of selectedPhotos){
+      for (var file of selectedPhotos) {
         handleShare(file, getImageType)
       }
       console.log("sending")
@@ -83,28 +77,28 @@ export default function PhotoScreen() {
 
     return (
       <View>
-      <View style={styles.shuffleButtonContainer}>
-        <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
-          <AntDesign name="swap" size={32} color="white" />
-        </TouchableOpacity>
-      </View>
-
-      {showPopUp && (
-        <View style={styles.popUpContainer}>
-          <TouchableOpacity style={styles.popUpButton} onPress={handleSendOnPress}>
-            <AntDesign name="upload" size={24} color="black" />
-            <Text style={styles.popUpText}>Send</Text>
-          </TouchableOpacity>
-          <View style={styles.spaceBetweenButtons} />
-          <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("ReceiveScreen")}>
-            <AntDesign name="download" size={24} color="black" />
-            <Text style={styles.popUpText}>Receive</Text>
+        <View style={styles.shuffleButtonContainer}>
+          <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
+            <AntDesign name="swap" size={32} color="white" />
           </TouchableOpacity>
         </View>
-      )}
+
+        {showPopUp && (
+          <View style={styles.popUpContainer}>
+            <TouchableOpacity style={styles.popUpButton} onPress={handleSendOnPress}>
+              <AntDesign name="upload" size={24} color="black" />
+              <Text style={styles.popUpText}>Send</Text>
+            </TouchableOpacity>
+            <View style={styles.spaceBetweenButtons} />
+            <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("ReceiveScreen")}>
+              <AntDesign name="download" size={24} color="black" />
+              <Text style={styles.popUpText}>Receive</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     )
-}
+  }
 
   const handleToggleSelectAll = () => {
     if (selectAll) {
@@ -122,11 +116,12 @@ export default function PhotoScreen() {
       <View style={styles.itemContainer}>
         <TouchableOpacity style={styles.thumbnailContainer} onPress={() => handlePhotoPress(item.uri)}>
           <Image source={{ uri: item.uri }} style={styles.thumbnail} />
+          <TouchableOpacity onPress={() => handleSelectPhoto(item)} style={styles.radioContainer}>
+            <View style={[styles.radioButton, isSelected(item) && styles.radioButtonSelected]}>
+              {isSelected(item) && <View style={styles.radioInner} />}
+            </View>
+          </TouchableOpacity>
         </TouchableOpacity>
-        <Checkbox
-          value={selectedPhotos.includes(item)}
-          onValueChange={() => handleSelectPhoto(item)}
-        />
       </View>
     );
   };
@@ -138,7 +133,6 @@ export default function PhotoScreen() {
   return (
     <ImageBackground
       style={styles.backgroundImage}
-       //source={require('../../assests/byte.jpg')} 
     >
       <View style={styles.container}>
         <View style={styles.header}>
@@ -150,7 +144,6 @@ export default function PhotoScreen() {
             onChangeText={setSearchQuery}
           />
           <ProfileButton />
-          {/* <Feather name="search" size={24} color="black" /> */}
         </View>
         <View style={styles.selectAllContainer}>
           <TouchableOpacity style={[styles.selectButton, selectAll && styles.selectButtonActive]} onPress={handleToggleSelectAll}>
@@ -198,11 +191,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 35,
     padding: 15,
-    shadowColor:'green',
-    shadowOffset:{width:0,height:6},
-    shadowOpacity:0.8,
-    shadowRadius:2,
-    borderRadius:40,
+    shadowColor: 'green',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    borderRadius: 40,
     backgroundColor: 'white', // Make header transparent to see background image
     elevation: 5,
   },
@@ -213,7 +206,7 @@ const styles = StyleSheet.create({
   searchBar: {
     flex: 1,
     marginHorizontal: 10,
-    marginEnd: 50,
+    marginEnd: 10,
     borderRadius: 10,
     padding: 8,
     backgroundColor: '#f0f0f0',
@@ -225,7 +218,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderBottomWidth: 9,
     borderBottomColor: '#f0f0f0',
-    marginTop:15,
+    marginTop: 15,
   },
   selectButton: {
     flexDirection: 'row',
@@ -236,7 +229,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e0e0e0',
   },
   selectButtonActive: {
-    backgroundColor: 'rgb(53,189,153)',
+    backgroundColor: 'rgb(53, 189, 153)',
   },
   selectButtonText: {
     marginLeft: 10,
@@ -250,6 +243,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     margin: 10,
+    position: 'relative', // For positioning the radio button within the thumbnail
   },
   thumbnailContainer: {
     width: '100%',
@@ -261,18 +255,29 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#d9d9d9',
   },
-  details: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 5,
+  radioContainer: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    zIndex: 1,
   },
-  title: {
-    fontSize: 12,
-    fontWeight: 'bold',
+  radioButton: {
+    height: 20,
+    width: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: '#888',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  size: {
-    fontSize: 12,
-    color: '#888',
+  radioButtonSelected: {
+    borderColor: 'rgb(53, 189, 153)',
+  },
+  radioInner: {
+    height: 10,
+    width: 10,
+    borderRadius: 5,
+    backgroundColor: 'rgb(53, 189, 153)',
   },
   columnWrapper: {
     justifyContent: 'space-between',
@@ -291,23 +296,18 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-
-
-  // shuffle buttons
   shuffleButtonContainer: {
     position: 'absolute',
     bottom: 20,
     alignSelf: 'center',
   },
-
   shuffleButton: {
-    backgroundColor: 'rgb(53,189,153)',
+    backgroundColor: 'rgb(53, 189, 153)',
     padding: 10,
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
-
   popUpContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -316,54 +316,9 @@ const styles = StyleSheet.create({
     bottom: 90,
     alignSelf: 'center',
   },
-
   popUpButton: {
-    backgroundColor: 'rgb(53,189,153)',
-    padding: 8,// Navigate to SendRequestScreen
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  popUpText: {
-    color: 'black',
-    fontSize: 16,
-    marginLeft: 5, // Add some space between icon and text
-  },
-  spaceBetweenButtons: {
-    width: 30,
-    marginEnd: 10,
-  },
-
-
-
-// shufle buttons
-  shuffleButtonContainer: {
-    position: 'absolute',
-    bottom: 20,
-    alignSelf: 'center',
-  },
-
-  shuffleButton: {
-    backgroundColor: 'rgb(53,189,153)',
-    padding: 10,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  popUpContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    padding: 20,
-    position: 'absolute',
-    bottom: 90,
-    alignSelf: 'center',
-  },
-
-  popUpButton: {
-    backgroundColor: 'rgb(53,189,153)',
-    padding: 8,// Navigate to SendRequestScreen
+    backgroundColor: 'rgb(53, 189, 153)',
+    padding: 8, // Navigate to SendRequestScreen
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',

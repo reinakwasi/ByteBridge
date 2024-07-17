@@ -3,7 +3,6 @@ import { View, Text, FlatList, Image, TextInput, StyleSheet, TouchableOpacity, I
 import * as MediaLibrary from 'expo-media-library';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { Video } from 'expo-av';
-import Checkbox from 'expo-checkbox';
 import { useNavigation } from '@react-navigation/native';
 import { getVideoType } from '../../utils';
 import { AntDesign } from '@expo/vector-icons';
@@ -28,7 +27,7 @@ export default function VideoScreen() {
     };
 
     const handleSendOnPress = () => {
-      if (selectedFiles.length==0){
+      if (selectedFiles.length === 0){
         navigation.navigate("SendRequestScreen")
       }
       console.log(selectedFiles)
@@ -40,28 +39,28 @@ export default function VideoScreen() {
 
     return (
       <View>
-      <View style={styles.shuffleButtonContainer}>
-        <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
-          <AntDesign name="swap" size={32} color="white" />
-        </TouchableOpacity>
-      </View>
-
-      {showPopUp && (
-        <View style={styles.popUpContainer}>
-          <TouchableOpacity style={styles.popUpButton} onPress={handleSendOnPress}>
-            <AntDesign name="upload" size={24} color="black" />
-            <Text style={styles.popUpText}>Send</Text>
-          </TouchableOpacity>
-          <View style={styles.spaceBetweenButtons} />
-          <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("ReceiveScreen")}>
-            <AntDesign name="download" size={24} color="black" />
-            <Text style={styles.popUpText}>Receive</Text>
+        <View style={styles.shuffleButtonContainer}>
+          <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
+            <AntDesign name="swap" size={32} color="white" />
           </TouchableOpacity>
         </View>
-      )}
+
+        {showPopUp && (
+          <View style={styles.popUpContainer}>
+            <TouchableOpacity style={styles.popUpButton} onPress={handleSendOnPress}>
+              <AntDesign name="upload" size={24} color="black" />
+              <Text style={styles.popUpText}>Send</Text>
+            </TouchableOpacity>
+            <View style={styles.spaceBetweenButtons} />
+            <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("ReceiveScreen")}>
+              <AntDesign name="download" size={24} color="black" />
+              <Text style={styles.popUpText}>Receive</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     )
-}
+  }
 
   useEffect(() => {
     const getPermissions = async () => {
@@ -97,14 +96,14 @@ export default function VideoScreen() {
   };
   
   const isSelected = (item) => {
-    return selectedFiles.includes(photo => photo.id === item.id);
+    return selectedFiles.some(file => file.id === item.id);
   };
   
   const handleToggleSelectAll = () => {
     if (selectAll) {
       setSelectedFiles([]);
     } else {
-      setSelectedFiles(videoFiles.map(file => file.id));
+      setSelectedFiles(videoFiles.map(file => file));
     }
     setSelectAll(!selectAll);
   };
@@ -120,20 +119,23 @@ export default function VideoScreen() {
 
   const renderItem = ({ item }) => {
     const fileSizeMB = item.size ? (item.size / 1048576).toFixed(2) + ' MB' : 'MB';
+    const isItemSelected = isSelected(item);
 
     return (
       <View style={styles.itemContainer}>
         <TouchableOpacity style={styles.thumbnailContainer} onPress={() => handleVideoPress(item.uri)}>
           <Image source={{ uri: item.uri }} style={styles.thumbnail} />
+          <TouchableOpacity
+            style={[styles.radioButton, isItemSelected && styles.radioButtonSelectedBorder]}
+            onPress={() => handleSelectFile(item)}
+          >
+            {isItemSelected && <View style={styles.radioButtonSelected} />}
+          </TouchableOpacity>
         </TouchableOpacity>
         <View style={styles.details}>
           <Text style={styles.title}>{item.filename}</Text>
           <Text style={styles.size}>{fileSizeMB}</Text>
         </View>
-        <Checkbox
-          value={selectedFiles.includes(item)}
-          onValueChange={() => handleSelectFile(item)}
-        />
       </View>
     );
   };
@@ -229,7 +231,7 @@ const styles = StyleSheet.create({
   searchBar: {
     flex: 1,
     marginHorizontal: 10,
-    marginEnd: 50,
+    marginEnd: 10,
     borderRadius: 10,
     padding: 8,
     backgroundColor: '#f0f0f0',
@@ -270,12 +272,36 @@ const styles = StyleSheet.create({
   thumbnailContainer: {
     width: '100%',
     height: 100,
+    position: 'relative', // Added to position the radio button
   },
   thumbnail: {
     width: '100%',
     height: '100%',
     borderRadius: 5,
     backgroundColor: '#d9d9d9',
+  },
+  radioButton: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: 'white',
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  radioButtonSelected: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: 'rgb(53, 189, 153)',
+  },
+  radioButtonSelectedBorder: {
+    borderColor: 'rgb(53, 189, 153)', // Change border color when selected
+    
   },
   details: {
     flexDirection: 'row',
@@ -318,9 +344,7 @@ const styles = StyleSheet.create({
     height: '50%',
   },
 
-
-
-// shuffle buttons
+  // shuffle buttons
   shuffleButtonContainer: {
     position: 'absolute',
     bottom: 20,
@@ -346,7 +370,7 @@ const styles = StyleSheet.create({
 
   popUpButton: {
     backgroundColor: 'rgb(53,189,153)',
-    padding: 8,// Navigate to SendRequestScreen
+    padding: 8, // Navigate to SendRequestScreen
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
@@ -362,6 +386,3 @@ const styles = StyleSheet.create({
     marginEnd: 10,
   },
 });
-
-
-

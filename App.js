@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-<<<<<<< HEAD
 import { MaterialIcons, AntDesign } from '@expo/vector-icons'; 
-import { NavigationContainer } from "@react-navigation/native";
-=======
-import { MaterialIcons, AntDesign } from '@expo/vector-icons'; // Import AntDesign from expo/vector-icons
+//import { NavigationContainer } from "@react-navigation/native";
+//import { MaterialIcons, AntDesign } from '@expo/vector-icons'; // Import AntDesign from expo/vector-icons
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
->>>>>>> c2d0d19d8406db4326fb274f67e1c2a533d16490
 import { createStackNavigator } from '@react-navigation/stack';
 
 import PhotoScreen from './Screens/components/PhotoScreen';
@@ -190,8 +187,5 @@ const styles = StyleSheet.create({
 });
 
 export default App;
-
-
-
 
 
