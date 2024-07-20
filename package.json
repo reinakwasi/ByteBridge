@@ -37,7 +37,11 @@
     "expo-linear-gradient": "~13.0.2",
     "expo-media-library": "~16.0.4",
     "expo-permissions": "^14.4.0",
+<<<<<<< Updated upstream
     "expo-sharing": "~12.0.1",
+=======
+    "expo-sharing": "^12.0.1",
+>>>>>>> Stashed changes
     "expo-status-bar": "~1.12.1",
     "lottie-react-native": "6.7.0",
     "node-fetch": "^3.3.2",
@@ -50,8 +54,11 @@
     "react-native-document-picker": "^9.3.0",
     "react-native-elements": "^3.4.3",
     "react-native-fbsdk-next": "^13.0.0",
+<<<<<<< Updated upstream
     "react-native-fetch-blob": "^0.10.8",
     "react-native-fs": "^2.20.0",
+=======
+>>>>>>> Stashed changes
     "react-native-gesture-handler": "~2.16.1",
     "react-native-image-picker": "^7.1.2",
     "react-native-linear-gradient": "^2.8.3",
@@ -67,7 +74,12 @@
     "react-native-svg": "15.2.0",
     "react-native-vector-icons": "^10.1.0",
     "react-navigation": "^5.0.0",
+<<<<<<< Updated upstream
     "typescript": "~5.3.3"
+=======
+    "typescript": "~5.3.3",
+    "expo-blur": "~13.0.2"
+>>>>>>> Stashed changes
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",

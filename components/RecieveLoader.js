@@ -1,24 +1,28 @@
 import { StyleSheet, Text, View } from 'react-native'
 import LottieView from 'lottie-react-native'
 import React from 'react'
+import { Platform } from 'react-native'
+import { FileSystem, shareAsync } from 'expo';
 
-const Loader = (props) => {
+
+const ReceiveLoader = (props) => {
     const { message } = props
   return (
     <View style={{alignItems: "center"}}>
     <LottieView
       style={styles.lottieIndicator}
-      source={require('../assests/bytebridgeLoading.json')}
+      source={require('../assets/bytebridgeLoading.json')}
       autoPlay
       loop
-      speed={2.2}
+      speed={2}
     />
     <Text style={styles.msg}>{`${message}...`}</Text>
     </View>
   )
 }
 
-export default Loader
+export default  ReceiveLoader
+
 
 const styles = StyleSheet.create({
   msg: {
@@ -28,7 +32,7 @@ const styles = StyleSheet.create({
 
   lottieIndicator: {
     // fontFamily:',
-    width: 250,
+    width: 400,
     height: 500
   }
 })

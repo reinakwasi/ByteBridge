@@ -77,9 +77,28 @@ export default function PhotoScreen() {
 
     return (
       <View>
+<<<<<<< Updated upstream
         <View style={styles.shuffleButtonContainer}>
           <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
             <AntDesign name="swap" size={32} color="white" />
+=======
+      <View style={styles.shuffleButtonContainer}>
+        <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
+          <AntDesign name="swap" size={32} color="white" />
+        </TouchableOpacity>
+      </View>
+
+      {showPopUp && (
+        <View style={styles.popUpContainer}>
+          <TouchableOpacity style={styles.popUpButton} onPress={handleSendOnPress}>
+            <AntDesign name="upload" size={24} color="white" />
+            <Text style={styles.popUpText}>Send</Text>
+          </TouchableOpacity>
+          <View style={styles.spaceBetweenButtons} />
+          <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("ReceiveScreen")}>
+            <AntDesign name="download" size={24} color="white" />
+            <Text style={styles.popUpText}>Receive</Text>
+>>>>>>> Stashed changes
           </TouchableOpacity>
         </View>
 
@@ -122,6 +141,16 @@ export default function PhotoScreen() {
             </View>
           </TouchableOpacity>
         </TouchableOpacity>
+<<<<<<< Updated upstream
+=======
+        <View style={styles.checkboxContainer}>
+          <Checkbox
+            value={selectedPhotos.includes(item)}
+            style = {{borderRadius: 50, borderColor:"rgb(211, 211, 211)"}}
+            onValueChange={() => handleSelectPhoto(item)}
+          />
+        </View>
+>>>>>>> Stashed changes
       </View>
     );
   };
@@ -136,7 +165,7 @@ export default function PhotoScreen() {
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <Image source={require('../../assests/logo.png')} style={styles.logo} />
+          <Image source={require('../../assets/logo.png')} style={styles.logo} />
           <TextInput
             style={styles.searchBar}
             placeholder="Search photos"
@@ -180,7 +209,7 @@ export default function PhotoScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)', // Adjust background opacity if needed
+    backgroundColor: 'rgb(247, 255, 255)', // Adjust background opacity if needed
   },
   backgroundImage: {
     flex: 1,
@@ -217,8 +246,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     backgroundColor: 'white',
     borderBottomWidth: 9,
+<<<<<<< Updated upstream
     borderBottomColor: '#f0f0f0',
     marginTop: 15,
+=======
+    borderBottomColor: '#fffff',
+    marginTop:15,
+>>>>>>> Stashed changes
   },
   selectButton: {
     flexDirection: 'row',
@@ -229,7 +263,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#e0e0e0',
   },
   selectButtonActive: {
+<<<<<<< Updated upstream
     backgroundColor: 'rgb(53, 189, 153)',
+=======
+    backgroundColor: '#004d40',
+>>>>>>> Stashed changes
   },
   selectButtonText: {
     marginLeft: 10,
@@ -255,11 +293,25 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#d9d9d9',
   },
+<<<<<<< Updated upstream
   radioContainer: {
     position: 'absolute',
     top: 5,
     right: 5,
     zIndex: 1,
+=======
+
+  checkboxContainer:{
+    position: 'absolute',
+    top: 5,
+    right: 5,
+  },
+
+  details: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 5,
+>>>>>>> Stashed changes
   },
   radioButton: {
     height: 20,
@@ -302,7 +354,11 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   shuffleButton: {
+<<<<<<< Updated upstream
     backgroundColor: 'rgb(53, 189, 153)',
+=======
+    backgroundColor: '#004d40',
+>>>>>>> Stashed changes
     padding: 10,
     borderRadius: 20,
     justifyContent: 'center',
@@ -317,15 +373,24 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   popUpButton: {
+<<<<<<< Updated upstream
     backgroundColor: 'rgb(53, 189, 153)',
     padding: 8, // Navigate to SendRequestScreen
+=======
+    backgroundColor: '#004d40',
+    padding: 8,// Navigate to SendRequestScreen
+>>>>>>> Stashed changes
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
   },
   popUpText: {
+<<<<<<< Updated upstream
     color: 'black',
+=======
+    color: 'white',
+>>>>>>> Stashed changes
     fontSize: 16,
     marginLeft: 5, // Add some space between icon and text
   },
@@ -333,4 +398,8 @@ const styles = StyleSheet.create({
     width: 30,
     marginEnd: 10,
   },
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 });

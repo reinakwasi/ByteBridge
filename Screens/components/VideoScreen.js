@@ -39,9 +39,28 @@ export default function VideoScreen() {
 
     return (
       <View>
+<<<<<<< Updated upstream
         <View style={styles.shuffleButtonContainer}>
           <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
             <AntDesign name="swap" size={32} color="white" />
+=======
+      <View style={styles.shuffleButtonContainer}>
+        <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
+          <AntDesign name="swap" size={32} color="white" />
+        </TouchableOpacity>
+      </View>
+
+      {showPopUp && (
+        <View style={styles.popUpContainer}>
+          <TouchableOpacity style={styles.popUpButton} onPress={handleSendOnPress}>
+            <AntDesign name="upload" size={24} color="white" />
+            <Text style={styles.popUpText}>Send</Text>
+          </TouchableOpacity>
+          <View style={styles.spaceBetweenButtons} />
+          <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("ReceiveScreen")}>
+            <AntDesign name="download" size={24} color="white" />
+            <Text style={styles.popUpText}>Receive</Text>
+>>>>>>> Stashed changes
           </TouchableOpacity>
         </View>
 
@@ -136,6 +155,16 @@ export default function VideoScreen() {
           <Text style={styles.title}>{item.filename}</Text>
           <Text style={styles.size}>{fileSizeMB}</Text>
         </View>
+<<<<<<< Updated upstream
+=======
+        <View style={styles.checkboxContainer}>
+        <Checkbox
+          style={{borderRadius: 50, borderColor:"rgb(211, 211, 211)"}}
+          value={selectedFiles.includes(item)}
+          onValueChange={() => handleSelectFile(item)}
+          />
+        </View>
+>>>>>>> Stashed changes
       </View>
     );
   };
@@ -151,7 +180,7 @@ export default function VideoScreen() {
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <Image source={require('../../assests/logo.png')} style={styles.logo} />
+          <Image source={require('../../assets/logo.png')} style={styles.logo} />
           <TextInput
             style={styles.searchBar}
             placeholder="Search video"
@@ -205,7 +234,7 @@ export default function VideoScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)', // Adjust background opacity if needed
+    backgroundColor: 'rgb(247, 255, 255)', // Adjust background opacity if needed
   },
   backgroundImage: {
     flex: 1,
@@ -231,6 +260,10 @@ const styles = StyleSheet.create({
   searchBar: {
     flex: 1,
     marginHorizontal: 10,
+<<<<<<< Updated upstream
+=======
+    // marginEnd: 50,
+>>>>>>> Stashed changes
     marginEnd: 10,
     borderRadius: 10,
     padding: 8,
@@ -254,7 +287,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e0e0e0',
   },
   selectButtonActive: {
-    backgroundColor: 'rgb(53,189,153)',
+    backgroundColor: '#004d40',
   },
   selectButtonText: {
     marginLeft: 10,
@@ -280,6 +313,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#d9d9d9',
   },
+<<<<<<< Updated upstream
   radioButton: {
     position: 'absolute',
     top: 5,
@@ -303,6 +337,16 @@ const styles = StyleSheet.create({
     borderColor: 'rgb(53, 189, 153)', // Change border color when selected
     
   },
+=======
+
+  checkboxContainer:{
+    position: 'absolute',
+    top: 5,
+    right: 5,
+  },
+  
+
+>>>>>>> Stashed changes
   details: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -352,7 +396,7 @@ const styles = StyleSheet.create({
   },
 
   shuffleButton: {
-    backgroundColor: 'rgb(53,189,153)',
+    backgroundColor: '#004d40',
     padding: 10,
     borderRadius: 20,
     justifyContent: 'center',
@@ -369,15 +413,20 @@ const styles = StyleSheet.create({
   },
 
   popUpButton: {
+<<<<<<< Updated upstream
     backgroundColor: 'rgb(53,189,153)',
     padding: 8, // Navigate to SendRequestScreen
+=======
+    backgroundColor: '#004d40',
+    padding: 8,// Navigate to SendRequestScreen
+>>>>>>> Stashed changes
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
   },
   popUpText: {
-    color: 'black',
+    color: 'white',
     fontSize: 16,
     marginLeft: 5, // Add some space between icon and text
   },

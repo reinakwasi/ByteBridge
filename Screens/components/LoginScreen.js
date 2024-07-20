@@ -1,11 +1,25 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, ScrollView, ImageBackground } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { BACKEND_URL } from '../../env';
+import { ActivityIndicator } from 'react-native';
+import { BlurView } from 'expo-blur';
+import { Modal } from 'react-native';
+import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const storage = AsyncStorage
 
 const LoginScreen = ({ navigation }) => {
   const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [loginError, setLoginError] = useState(false)
+  const [loginErrorMessage, setLoginErrorMessage] = useState("")
+
+  // const navigation = useNavigation()
 
   const validate = () => {
     const newErrors = {};
@@ -15,15 +29,45 @@ const LoginScreen = ({ navigation }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
+
     if (!validate()) return;
+    var data = { 
+      email: emailOrUsername,
+      password: password
+          }
+
+    console.log(data)
+    setLoading(true)
+    await axios.post(`${BACKEND_URL}/accounts/login/`, data)
+    .then((res)=>{
+    setLoading(false)
+    if (res.status ==200){
+      console.log(res.data)
+      access_token = res.data['access']
+      storage.setItem('token', access_token)
+      console.log(res.data)
+      navigation.navigate('CloudScreen', {access_token:access_token})
+    }
+    else if (res.status = 401) {
+      setLoginErrorMessage("Credetials Invalid")
+      console.log(res.data)
+    }
+    })
+    .catch((err)=>{
+      setLoading(false)
+      setLoginError(true)
+      setLoginErrorMessage("Credetials Invalid")
+      console.log(err)
+    })
+  
 
     // Implement login logic here
-    console.log('Logging in with:', emailOrUsername, password);
+    // console.log('Logging in with:', emailOrUsername, password);
   };
 
   return (
-    <ImageBackground source={require('../../assests/byte.jpg')} style={styles.backgroundImage}>
+    <ImageBackground source={require('../../assets/byte.jpg')} style={styles.backgroundImage}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <View style={styles.formContainer}>
@@ -31,13 +75,13 @@ const LoginScreen = ({ navigation }) => {
               <TouchableOpacity style={styles.switchButtonActive}>
                 <Text style={styles.switchTextActive}>Login</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.switchButton} onPress={() => navigation.navigate('Signup')}>
+              <TouchableOpacity style={styles.switchButton} onPress={() => navigation.navigate('SignupScreen')}>
                 <Text style={styles.switchText}>Sign up</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.inputContainer}>
               <TextInput
-                placeholder="Email or Username"
+                placeholder="Email or Username"     
                 style={[styles.input, errors.emailOrUsername && styles.inputError]}
                 value={emailOrUsername}
                 onChangeText={setEmailOrUsername}
@@ -57,6 +101,7 @@ const LoginScreen = ({ navigation }) => {
             <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
               <Text style={styles.forgotPassword}>Forgot Password?</Text>
             </TouchableOpacity>
+            {loginError && <Text style={styles.errorText}>{loginErrorMessage}</Text>}
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
               <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
@@ -76,6 +121,18 @@ const LoginScreen = ({ navigation }) => {
           </View>
         </View>
       </ScrollView>
+
+      <Modal visible={loading} transparent animationType="fade">
+      <BlurView intensity={90} tint="light" style={styles.blurContainer}>
+      <View style={styles.modalContainer}>
+        {/* <GeneralLoader /> */}
+        {/* <ReceiveLoader /> */}
+          <ActivityIndicator size={60} color="#004d40" />
+          {/* <Text style={styles.text}>loading...</Text> */}
+        </View>
+      </BlurView>
+      </Modal>
+
     </ImageBackground>
   );
 };
@@ -203,6 +260,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 25,
     backgroundColor: 'transparent',
+  },
+
+  blurContainer: {
+    flex: 1,
+    padding: 20,
+    margin: 16,
+    textAlign: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    borderRadius: 20,
+  },
+
+  text: {
+    marginTop: 130,
+    fontSize: 24,
+    color: "#004d40",
+    fontWeight: '600',
+  },
+
+  modalContainer: {
+    flex: 1,
+    // backgroundColor: "red",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

@@ -297,7 +297,7 @@ export default function DocumentScreen() {
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <Image source={require('../../assests/logo.png')} style={styles.logo} />
+          <Image source={require('../../assets/logo.png')} style={styles.logo} />
           <TextInput
             style={styles.searchBar}
             placeholder="Search documents"

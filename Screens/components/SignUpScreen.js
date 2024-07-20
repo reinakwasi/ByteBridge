@@ -1,58 +1,134 @@
 // SignupScreen.js
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, ImageBackground, ScrollView } from 'react-native';
+import { View, 
+        TextInput, 
+        TouchableOpacity, 
+        Text, 
+        StyleSheet, 
+        Modal,
+        ImageBackground, 
+        ScrollView, 
+        ActivityIndicator } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { BACKEND_URL } from '../../env';
+import axios from 'axios';
+import { BlurView } from 'expo-blur';
+import { useNavigation } from '@react-navigation/native';
+
+
+const registrationEndpoint=`${BACKEND_URL}/accounts/signup/`
+const emailVerificationEndpoint=`${BACKEND_URL}/accounts/verify-email/`
 
 const SignupScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState('');
+  const [code, setCode] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
+  const [validationStage, setValidationStage] = useState(true);
+  const [start, setStart] = useState(false)
+  const [emailCodeSent, setEmailCodeSent] = useState(false)
+  const [submissionEndpoint, setSubmissionEndpoint ] = useState(registrationEndpoint)
+  // const navigation = useNavigation()
 
   const validate = () => {
     const newErrors = {};
     if (!email) newErrors.email = 'Email is required';
+    if (!code) newErrors.code = 'Code is required';
     if (!password) newErrors.password = 'Password is required';
+    // if (!password.length>6) console.log(password.length)
     if (!confirmPassword) newErrors.confirmPassword = 'Confirm Password is required';
     if (password !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSignup = async () => {
-    if (!validate()) return;
-
+  const handleEmailVerification = async () => {
+    console.log("email verification")
+    if (!validate()) return
+    let data = { email: email, code:code}
+    setLoading(true)
     try {
-      const response = await fetch('http://localhost:3000/send-verification-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-      if (response.status === 200) {
-        navigation.navigate('Verification', { email, verificationCode: data.verificationCode });
-      } else {
-        alert('Failed to send verification code. Please try again.');
+      await axios.post(submissionEndpoint, data)
+      .then(res => {
+        if (res.status==200){
+          alert(String(res.data.detail))
+          setSubmissionEndpoint(emailVerificationEndpoint)
+          setEmailCodeSent(true)
+          setLoading(false)
+          let msg = res.data['detail']
+          navigation.navigate("LoginScreen")
+        }
+        else {
+          setLoading(false)
+          alert(String(res.data.detail))
+        }
+      })
+      .catch(function (error) {
+        setLoading(false)
+        console.log(error)
+        alert('Verification failed')
+        // setverificationCodeSent(false)
+        // setregistrationMessage("Email Verification Failed")
       }
+      )
     } catch (error) {
+      console.log(error)
+      alert('An error occurred. Please try again.');
+    }
+  };
+
+  const handleSignup = async () => {
+    console.log("sigup")
+    // if (password.length >= 6){
+
+    // }
+    // if (!validate()) return
+    let data = { email: email, password:password}
+    console.log(registrationEndpoint)
+    setLoading(true)
+    // if (validationStage || !validate()) return;
+    try {
+      await axios.post(registrationEndpoint, data)
+      .then(res => {
+        if (res.status==200){
+          alert(String(res.data.detail))
+          setSubmissionEndpoint(emailVerificationEndpoint)
+          setEmailCodeSent(true)
+          setLoading(false)
+          console.log(res)
+          let msg = res.data['detail']
+          navigation.navigate("LoginScreen")
+        }else {
+          alert("Sign up failed")
+        }
+      })
+      .catch(function (error) {
+        setLoading(false)
+        console.log(error)
+        alert('Sign up failed')
+        // setverificationCodeSent(false)
+        // setregistrationMessage("Email Verification Failed")
+      }
+      )
+    } catch (error) {
+      console.log(error)
       alert('An error occurred. Please try again.');
     }
   };
 
   return (
-    <ImageBackground source={require('../../assests/byte.jpg')} style={styles.backgroundImage}>
+    <ImageBackground source={require('../../assets/byte.jpg')} style={styles.backgroundImage}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
           <View style={styles.formContainer}>
             <View style={styles.switchContainer}>
-              <TouchableOpacity style={styles.switchButton} onPress={() => navigation.navigate('Login')}>
+              <TouchableOpacity style={styles.switchButton} onPress={() => navigation.navigate('LoginScreen')}>
                 <Text style={styles.switchText}>Login</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.switchButtonActive}>
-                <Text style={styles.switchTextActive}>Sign up</Text>
+                <Text style={styles.switchTextActive}>Register</Text>
               </TouchableOpacity>
             </View>
             <TextInput
@@ -61,26 +137,56 @@ const SignupScreen = ({ navigation }) => {
               value={email}
               onChangeText={setEmail}
             />
-            {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
-            <TextInput
-              placeholder="Password"
-              secureTextEntry={true}
-              style={[styles.input, errors.password && styles.inputError]}
-              value={password}
-              onChangeText={setPassword}
-            />
-            {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
-            <TextInput
-              placeholder="Confirm Password"
-              secureTextEntry={true}
-              style={[styles.input, errors.confirmPassword && styles.inputError]}
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-            />
-            {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword}</Text>}
+              {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+              <TextInput
+                placeholder="Password"
+                secureTextEntry={true}
+                style={[styles.input, errors.password && styles.inputError]}
+                value={password}
+                onChangeText={setPassword}
+              />
+                {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+              {/* {start &&
+                (<> */}
+                <TextInput
+                  placeholder="Confirm Password"
+                  secureTextEntry={true}
+                  style={[styles.input, errors.confirmPassword && styles.inputError]}
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                />
+                {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword}</Text>}
+                 {/* {start &&
+                {/* </>
+                ) */}
+              {/* } */}
+              {/* {emailCodeSent && (
+                <>
+                {errors.code && <Text style={styles.errorText}>{errors.code}</Text>}
+                <TextInput
+                placeholder="Input the OTP sent your email"
+                secureTextEntry={true}
+                style={[styles.input, errors.code && styles.inputError]}
+                value={code}
+                onChangeText={setCode}
+                />
+                </>
+                )
+              } */}
+            
+            {/* {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword}</Text>}
+            {emailCodeSent?
+            (<TouchableOpacity style={styles.button} onPress={handleEmailVerification}>
+              <Text style={styles.buttonText}>Verify Code</Text>
+            </TouchableOpacity>):
+             (<TouchableOpacity style={styles.button} onPress={handleSignup}>
+              <Text style={styles.buttonText}>Register</Text>
+            </TouchableOpacity>)
+            } */}
             <TouchableOpacity style={styles.button} onPress={handleSignup}>
-              <Text style={styles.buttonText}>Sign up</Text>
+              <Text style={styles.buttonText}>Register</Text>
             </TouchableOpacity>
+
             <Text style={styles.orText}>Or</Text>
             <Text style={styles.SigninwithText}>Sign up with</Text>
             <View style={styles.socialContainer}>
@@ -97,6 +203,18 @@ const SignupScreen = ({ navigation }) => {
           </View>
         </View>
       </ScrollView>
+
+      <Modal visible={loading} transparent animationType="fade">
+      <BlurView intensity={90} tint="light" style={styles.blurContainer}>
+      <View style={styles.modalContainer}>
+        {/* <GeneralLoader /> */}
+        {/* <ReceiveLoader /> */}
+          <ActivityIndicator size={60} color="#004d40" />
+          {/* <Text style={styles.text}>loading...</Text> */}
+        </View>
+      </BlurView>
+      </Modal>
+
     </ImageBackground>
   );
 };
@@ -132,7 +250,20 @@ const styles = StyleSheet.create({
   },
   switchContainer: {
     flexDirection: 'row',
-    marginBottom: 40,
+    marginBottom: 40, blurView: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    modalContainer: {
+      flex: 1,  text: {
+        fontSize: 24,
+        fontWeight: '600',
+      },
+      // backgroundColor: "red",
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
   },
   switchButton: {
     flex: 1,
@@ -175,6 +306,7 @@ const styles = StyleSheet.create({
     marginTop: -25,
     marginBottom:10,
     paddingTop:2,
+    paddingLeft: 12,
     paddingBottom:12,
   },
 
@@ -215,6 +347,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 25,
     backgroundColor: 'transparent',
+  },
+
+  blurContainer: {
+    flex: 1,
+    padding: 20,
+    margin: 16,
+    textAlign: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    borderRadius: 20,
+  },
+
+  text: {
+    marginTop: 130,
+    fontSize: 24,
+    color: "#004d40",
+    fontWeight: '600',
+  },
+
+  modalContainer: {
+    flex: 1,
+    // backgroundColor: "red",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

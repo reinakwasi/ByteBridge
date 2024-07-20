@@ -1,5 +1,8 @@
+<<<<<<< Updated upstream
 
 
+=======
+>>>>>>> Stashed changes
 {
   "expo": {
     "name": "ByteBridge",
@@ -9,8 +12,14 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
+<<<<<<< Updated upstream
       "image": "./assests/splash.jpg",
       "resizeMode": "cover"
+=======
+      "image": "./assets/splash.jpg",
+      "resizeMode": "contain"
+      
+>>>>>>> Stashed changes
     },
     "ios": {
       "supportsTablet": true
