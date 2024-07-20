@@ -1,21 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, ScrollView, ImageBackground } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { BACKEND_URL } from '../../env';
 
-const VerificationScreen = () => {
+const VerificationScreen = ({ props }) => {
+  const [verificationCode, setVerificationCode] = useState(null)
+  const emailVerificationEndpoint = `${BACKEND_URL}/accounts/verify-email/`
 
+  const email = props.email
   // Function to handle verification
-  const handleVerification = () => {
-    // Implement your verification logic here
+  const handleVerification = async () => {
+    try {
+      const response = await fetch(emailVerificationEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+        })
+
+      const data = await response.json();
+        if (response.status === 200) {
+          navigation.navigate('VerificationScreen', {email});
+        } else {
+          alert('Failed to send verification code. Please try again.');
+        }
+    } catch (error) {
+      alert('An error occurred. Please try again.');
+    }
     console.log('Verifying code');
   };
 
   return (
-    <ImageBackground source={require('../../assests/byte.jpg')} style={styles.backgroundImage}>
+    <ImageBackground source={require('../../assets/byte.jpg')} style={styles.backgroundImage}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.formContainer}>
           <Text style={styles.verificationText}>Verification</Text>
-          <TextInput placeholder="Enter Verification Code" style={styles.input} />
+
+          <TextInput 
+          onChangeText={setVerificationCode}
+          placeholder="Enter Verification Code" 
+          style={styles.input}
+           />
+
           <TouchableOpacity style={styles.button} onPress={handleVerification}>
             <Text style={styles.buttonText}>Verify</Text>
           </TouchableOpacity>

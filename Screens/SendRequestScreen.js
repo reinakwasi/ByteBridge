@@ -1,9 +1,10 @@
-import { StyleSheet, Text, Image, TextInput, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, Text, Image, TextInput, Alert, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { useState } from 'react';
 import QRCode from 'react-native-qrcode-svg';
 import { WEBSOCKET_URL } from '../env';
 import { setItem } from '../utils';
+import ProfileButton from '../components/ProfileComponent';
 
 
 
@@ -47,6 +48,11 @@ const SendRequestScreen = () => {
             Alert.alert(e.message);
         };
 
+        ws.onmessage = (e) => {
+            message = JSON.parse(e.data)
+            Alert.alert(message.message)
+        }
+
         setIsActive(true);
     };
     
@@ -59,6 +65,7 @@ const SendRequestScreen = () => {
                 </Text>
                 {isActive && (
                     <View style={styles.qrCode}>
+                        <ProfileButton />
                         <QRCode
                             value={qrValue}
                             size={200}
@@ -87,7 +94,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#eee',
+        backgroundColor: 'rgb(227, 255, 255)',
     },
     wrapper: {
         maxWidth: 300,
@@ -107,7 +114,7 @@ const styles = StyleSheet.create({
     },
 
     button: {
-        backgroundColor: 'rgb(53,189,153)',
+        backgroundColor: '#004d40',
         borderRadius: 5,
         padding: 15,
         alignItems: 'center',
@@ -117,6 +124,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
     },
     qrCode: {
+        // marginTop: 12,
         marginBottom: 20,
         alignItems: 'center',
     },

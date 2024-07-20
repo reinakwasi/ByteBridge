@@ -1,7 +1,10 @@
 import React, { useState, useEffect, } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, Button, FlatList, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Button, Alert, FlatList, Pressable, ImageBackground } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import Loader from '../components/Loader';
+import ProfileButton from '../components/ProfileComponent';
+import { FileSystem, shareAsync } from 'expo';
+import { Platform } from 'react-native';
+import ReceiveLoader from '../components/RecieveLoader';
 
 let  SHARE_SERVER_URL = ""
 
@@ -15,12 +18,47 @@ const ReceiveScreen = () => {
   const [isLoading, setLoading] = useState(false)
   const [message, setMessage] = useState("Connecting")
 
+  async function saveFile(uri, filename, mimetype) {
+    if (Platform.OS === "android") {
+      const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+  
+      if (permissions.granted) {
+        const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+  
+        await FileSystem.StorageAccessFramework.createFileAsync(permissions.directoryUri, filename, mimetype)
+          .then(async (uri) => {
+            await FileSystem.writeAsStringAsync(uri, base64, { encoding: FileSystem.EncodingType.Base64 });
+          })
+          .catch(e => console.log(e));
+      } else {
+        shareAsync(uri);
+      }
+    } else {
+      shareAsync(uri);
+    }
+  }
+
+  async function download() {
+    const filename = "dummy.png";
+    const result = await FileSystem.downloadAsync(
+      "https://justgohealth-backend.onrender.com/media/images/default.png",
+      FileSystem.documentDirectory + filename
+    );
+  
+    // Log the download result
+    console.log(result);
+  
+    // Save the downloaded file
+    saveFile(result.uri, filename, result.headers["Content-Type"]);
+  }
+
   useEffect(() => {
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === 'granted');
     })();
   }, []);
+
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
@@ -30,57 +68,58 @@ const ReceiveScreen = () => {
     setLoading(true)
 
     SHARE_SERVER_URL = data
-
+    console.log(data)
     const ws = new WebSocket(SHARE_SERVER_URL);
-
+    // download()
     console.log(data)
 
     ws.onopen = () => {
       console.log('WebSocket connection opened');
       setMessage("Waiting to receive files");
+      Alert.alert("Connection has been made")
       };
 
-      // ws.onmessage = (event) => {
-      //   setLoading(false);
-      //   const receivedData = JSON.parse(event.data);
+      ws.onmessage = (event) => {
+        setLoading(false);
+        const receivedData = JSON.parse(event.data);
   
-      //   Alert.alert(
-      //     'Incoming File',
-      //     `Accept file ${String(receivedData.file_name).slice(6)}?`,
-      //     [
-      //       {
-      //         text: 'Reject',
-      //         style: 'cancel',
-      //         onPress: () => {
-      //           console.log('File rejected');
-      //           // Optionally send rejection message to backend
-      //         },
-      //       },
-      //       {
-      //         text: 'Accept',
-      //         onPress: () => {
-      //           console.log('File accepted');
-      //           console.log(receivedData)
-      //           setReceiveFiles(prevFiles => [...prevFiles, receivedData]);
-      //           // initiateFileProcessing(data);      // serverMessagesList.push(e.data);
-      //         },
-      //       },
-      //     ],
-      //     { cancelable: false }
-      //       );
-      // };
+        Alert.alert(
+          'Incoming File',
+          `Accept file ${String(receivedData.file_name).slice(6)}?`,
+          [
+            {
+              text: 'Reject',
+              style: 'cancel',
+              onPress: () => {
+                console.log('File rejected');
+                // Optionally send rejection message to backend
+              },
+            },
+            {
+              text: 'Accept',
+              onPress: () => {
+                console.log('File accepted');
+                console.log(receivedData)
+                setReceiveFiles(prevFiles => [...prevFiles, receivedData]);
+                // initiateFileProcessing(data);      // serverMessagesList.push(e.data);
+              },
+            },
+          ],
+          { cancelable: false }
+            );
+      };
   
-      // ws.onerror = (error) => {
-      //   console.error('WebSocket Error:', error.message);
-      //   setMessage("WebSocket error occurred");
-      //   setLoading(false);
-      // };
+      ws.onerror = (error) => {
+        console.error('WebSocket Error:', error.message);
+        setMessage("WebSocket error occurred");
+        setLoading(false);
+      };
   
-      // ws.onclose = (event) => {
-      //   console.log('WebSocket closed:', event.code, event.reason);
-      //   setMessage("WebSocket connection closed");
-      //   setLoading(false);
-      // };
+      ws.onclose = (event) => {
+        console.log('WebSocket closed:', event.code, event.reason);
+        setMessage("WebSocket connection closed");
+        setLoading(false);
+      };
   
   
       
@@ -112,10 +151,16 @@ const ReceiveScreen = () => {
 
 
   return (
-    <View style={styles.container}>
+    <ImageBackground source={require('../assets/byte.jpg')} style={styles.container}>
       {showRecievedFiles ? (
         isLoading ? (
-          <Loader message={message} />
+          <View>
+            <View style={styles.profileContainer} >
+            <ProfileButton />
+            <Text style={styles.profileText}>Me</Text>
+            </View>
+            <ReceiveLoader />
+          </View>
         ) : (
           <FlatList 
             data={receiveFiles} 
@@ -128,11 +173,11 @@ const ReceiveScreen = () => {
         <View>
           {showScanner && (
             <View style={styles.scannerContainer}>
-              <Text style={styles.description}>Scan To Connect...</Text>
               <BarCodeScanner
                 onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
                 style={styles.scanner}
               />
+              <Text style={styles.description}>Scan To Connect...</Text>
             </View>
           )}
           {scanned && (
@@ -143,7 +188,7 @@ const ReceiveScreen = () => {
           {/* {scannedData ? <Text>{scannedData}</Text> : null} */}
         </View>
       )}
-    </View>
+    </ImageBackground>
   );
 }
   
@@ -153,6 +198,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
+    backgroundColor: "rgb(210, 255, 255)",
     alignItems: "center"
   },
 
@@ -167,15 +213,34 @@ const styles = StyleSheet.create({
   },
 
   scannerContainer: {
-    backgroundColor: "rgb(53,189,153)",
+    backgroundColor: "rgb(210, 255, 255)",
     padding: 12,
-    borderRadius: 12,
+    marginTop: 40,
+    width: 330,
+    alignItems:"center",
+    padding: 30,
+    borderRadius: 35,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 10,
   },
 
   description: {
     fontSize:20,
     textAlign:"center",
-    marginBottom:12
+    marginTop:12
+  },
+
+  profileContainer:{
+    display: "flex",
+    flexDirection: "column",
+    alignItems:"center"
+  },
+
+  profileText: {
+    fontWeight:"600"
   },
 
   buttonText:{

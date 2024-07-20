@@ -364,9 +364,28 @@ export default function AudioScreen() {
 
     return (
       <View>
+<<<<<<< Updated upstream
         <View style={styles.shuffleButtonContainer}>
           <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
             <AntDesign name="swap" size={32} color="white" />
+=======
+      <View style={styles.shuffleButtonContainer}>
+        <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
+          <AntDesign name="swap" size={32} color="white" />
+        </TouchableOpacity>
+      </View>
+
+      {showPopUp && (
+        <View style={styles.popUpContainer}>
+          <TouchableOpacity style={styles.popUpButton} onPress={handleSendOnPress}>
+            <AntDesign name="upload" size={24} color="white" />
+            <Text style={styles.popUpText}>Send</Text>
+          </TouchableOpacity>
+          <View style={styles.spaceBetweenButtons} />
+          <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("ReceiveScreen")}>
+            <AntDesign name="download" size={24} color="white" />
+            <Text style={styles.popUpText}>Receive</Text>
+>>>>>>> Stashed changes
           </TouchableOpacity>
         </View>
 
@@ -451,12 +470,19 @@ export default function AudioScreen() {
           <Text style={styles.title}>{item.filename}</Text>
           <Text style={styles.size}>{fileSizeMB}</Text>
         </TouchableOpacity>
+<<<<<<< Updated upstream
         <RadioButton
           value={item.id}
           status={isSelected(item) ? 'checked' : 'unchecked'}
           onPress={() => handleSelectFile(item)}
           uncheckedColor="#000"
           color="rgb(53,189,153)"
+=======
+        <Checkbox
+          style = {{borderRadius: 50}}
+          value={selectedFiles.includes(item)}
+          onValueChange={() => handleSelectFile(item)}
+>>>>>>> Stashed changes
         />
       </View>
     );
@@ -477,7 +503,7 @@ export default function AudioScreen() {
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <Image source={require('../../assests/logo.png')} style={styles.logo} />
+          <Image source={require('../../assets/logo.png')} style={styles.logo} />
           <TextInput
             style={styles.searchBar}
             placeholder="Search audio"
@@ -510,7 +536,7 @@ export default function AudioScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)', // Adjust background opacity if needed
+    backgroundColor: 'rgb(247, 255, 255)', // Adjust background opacity if needed
   },
   backgroundImage: {
     flex: 1,
@@ -536,7 +562,7 @@ const styles = StyleSheet.create({
   searchBar: {
     flex: 1,
     marginHorizontal: 10,
-    marginEnd: 50,
+    marginEnd: 10,
     borderRadius: 10,
     padding: 8,
     backgroundColor: '#f0f0f0',
@@ -559,7 +585,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e0e0e0',
   },
   selectButtonActive: {
-    backgroundColor: 'rgb(53,189,153)',
+    backgroundColor: '#004d40',
   },
   selectButtonText: {
     marginLeft: 10,
@@ -603,7 +629,7 @@ const styles = StyleSheet.create({
   },
 
   shuffleButton: {
-    backgroundColor: 'rgb(53,189,153)',
+    backgroundColor: '#004d40',
     padding: 10,
     borderRadius: 20,
     justifyContent: 'center',
@@ -620,15 +646,20 @@ const styles = StyleSheet.create({
   },
 
   popUpButton: {
+<<<<<<< Updated upstream
     backgroundColor: 'rgb(53,189,153)',
     padding: 8, // Navigate to SendRequestScreen
+=======
+    backgroundColor: '#004d40',
+    padding: 8,// Navigate to SendRequestScreen
+>>>>>>> Stashed changes
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
   },
   popUpText: {
-    color: 'black',
+    color: 'white',
     fontSize: 16,
     marginLeft: 5, // Add some space between icon and text
   },

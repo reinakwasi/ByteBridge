@@ -10,10 +10,10 @@ const ProfileButton = () => {
   let [ username, setUsername ] = useState("Profile")
   const navigation = useNavigation()
   return (
-    <Pressable onPress={() => navigation.navigate("Cloud")}>
+    <Pressable onPress={() => navigation.navigate("CloudScreen")}>
        <Image
         style={styles.Image}
-        source={require('../assests/profile.png')}
+        source={require('../assets/profile.png')}
       />
     {/* <Text className="text-slate-900">{username}</Text> */}
   </Pressable>

@@ -1,18 +1,25 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+<<<<<<< Updated upstream
 import { MaterialIcons, AntDesign } from '@expo/vector-icons'; 
 //import { NavigationContainer } from "@react-navigation/native";
 //import { MaterialIcons, AntDesign } from '@expo/vector-icons'; // Import AntDesign from expo/vector-icons
+=======
+import { MaterialIcons, AntDesign, } from '@expo/vector-icons'; // Import AntDesign from expo/vector-icons
+>>>>>>> Stashed changes
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from '@react-navigation/stack';
-
 import PhotoScreen from './Screens/components/PhotoScreen';
 import VideoScreen from './Screens/components/VideoScreen';
 import AudioScreen from './Screens/components/AudioScreen';
 import DocumentScreen from './Screens/components/Document';
 import SendRequestScreen from './Screens/SendRequestScreen';
 import ReceiveScreen from './Screens/ReceiveScreen';
+import CloudScreen from './Screens/components/CloudScreen';
+import LoginScreen from './Screens/components/LoginScreen';
+import SignupScreen from './Screens/components/SignUpScreen';
+import VerificationScreen from './Screens/components/VerificationScreen';
 
 
 
@@ -25,14 +32,17 @@ const MainTapNavigator = () => {
       screenOptions={({ route }) => ({
         tabBarStyle: {
           borderTopWidth: 0,
-          height: 70,
+          height: 73,
           paddingTop: 12,
-          paddingBottom: 12
+          backgroundColor:"rgb(247, 255, 255)",
+          // borderTopEndRadius:150,
+          elevation:32,
+          paddingBottom: 12,
         },
         headerShown: false,
-        tabBarIcon: ({ color, size }) => {
+        tabBarIcon: ({ color}) => {
           let iconName;
-
+          const size = 33
           switch (route.name) {
             case 'Photo':
               iconName = 'photo';
@@ -52,7 +62,7 @@ const MainTapNavigator = () => {
         },
       })}
       tabBarOptions={{
-        activeTintColor: 'rgb(53,189,153)',
+        activeTintColor: '#004d40',
         inactiveTintColor: 'gray',
       }}
     >
@@ -62,40 +72,6 @@ const MainTapNavigator = () => {
       <Tab.Screen name="Document" component={DocumentScreen} />
     </Tab.Navigator>
   )
-}
-
-const ShuffleButtonComponent = () => {
-    const navigation = useNavigation()
-
-    const [showPopUp, setShowPopUp] = useState(false);
-
-    const handleShufflePress = () => {
-      setShowPopUp(!showPopUp);
-    };
-
-    return (
-      <View>
-      <View style={styles.shuffleButtonContainer}>
-        <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
-          <AntDesign name="swap" size={32} color="white" />
-        </TouchableOpacity>
-      </View>
-
-      {showPopUp && (
-        <View style={styles.popUpContainer}>
-          <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("SendRequestScreen")}>
-            <AntDesign name="upload" size={24} color="black" />
-            <Text style={styles.popUpText}>Send</Text>
-          </TouchableOpacity>
-          <View style={styles.spaceBetweenButtons} />
-          <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("ReceiveScreen")}>
-            <AntDesign name="download" size={24} color="black" />
-            <Text style={styles.popUpText}>Receive</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-      </View>
-    )
 }
 
 const MainStackNavigator = () => {
@@ -125,9 +101,39 @@ const MainStackNavigator = () => {
         name='ReceiveScreen'
         component={ReceiveScreen}
         />
+
+        <Stack.Screen 
+        options={{
+          headerShown: false
+        }}
+        name='SignupScreen'
+        component={SignupScreen}
+        />
+
+        <Stack.Screen 
+        options={{
+          headerShown: false
+        }}
+        name='VerificationScreen'
+        component={VerificationScreen}
+        />
+
+        <Stack.Screen 
+        options={{
+          headerShown: false
+        }}
+        name='LoginScreen'
+        component={LoginScreen}
+        />
+
+        <Stack.Screen 
+        options={{
+          headerShown: false
+        }}
+        name='CloudScreen'
+        component={CloudScreen}
+        />
       </Stack.Navigator> 
-      
-      {/* <ShuffleButtonComponent /> */}
     </NavigationContainer>
 
   )
@@ -146,43 +152,6 @@ const App = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  shuffleButtonContainer: {
-    position: 'absolute',
-    bottom: 100,
-    alignSelf: 'center',
-  },
-  shuffleButton: {
-    backgroundColor: 'rgb(53,189,153)',
-    padding: 10,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  popUpContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    padding: 20,
-    position: 'absolute',
-    bottom: 150,
-    alignSelf: 'center',
-  },
-  popUpButton: {
-    backgroundColor: 'rgb(53,189,153)',
-    padding: 8,// Navigate to SendRequestScreen
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  popUpText: {
-    color: 'black',
-    fontSize: 16,
-    marginLeft: 5, // Add some space between icon and text
-  },
-  spaceBetweenButtons: {
-    width: 30,
-    marginEnd: 10,
   },
 });
 
