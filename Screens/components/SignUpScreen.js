@@ -186,20 +186,6 @@ const SignupScreen = ({ navigation }) => {
             <TouchableOpacity style={styles.button} onPress={handleSignup}>
               <Text style={styles.buttonText}>Register</Text>
             </TouchableOpacity>
-
-            <Text style={styles.orText}>Or</Text>
-            <Text style={styles.SigninwithText}>Sign up with</Text>
-            <View style={styles.socialContainer}>
-              <TouchableOpacity style={styles.socialButton}>
-                <MaterialCommunityIcons name="google" size={50} color="#db4a39" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.socialButton}>
-                <MaterialCommunityIcons name="facebook" size={50} color="#3b5998" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.socialButton}>
-                <MaterialCommunityIcons name="twitter" size={51} color="#1da1f2" />
-              </TouchableOpacity>
-            </View>
           </View>
         </View>
       </ScrollView>
@@ -323,31 +309,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
   },
-  orText: {
-    fontSize: 16,
-    color: '#aaa',
-    marginBottom: 30,
-    textAlign: 'center',
-  },
-  SigninwithText: {
-    fontSize: 16,
-    color: '#aaa',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  socialContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  socialButton: {
-    marginHorizontal: 18,
-    width: 50,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 25,
-    backgroundColor: 'transparent',
-  },
+ 
+  
 
   blurContainer: {
     flex: 1,

@@ -17,22 +17,26 @@ const ForgotPasswordScreen = ({ navigation }) => {
   };
 
   return (
-    <ImageBackground source={require('../../assests/byte.jpg')} style={styles.backgroundImage}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+     <ImageBackground source={require('../../assets/byte.jpg')} style={styles.backgroundImage}>
+         <ScrollView contentContainerStyle ={styles.scrollContainer}>  
         <View style={styles.formContainer}>
+        
           <Text style={styles.forgotPasswordText}>Forgot Password</Text>
+        
+
           <TextInput
             placeholder="Enter Email"
             style={styles.input}
             value={email}
             onChangeText={setEmail}
+            
           />
           <TouchableOpacity style={styles.button} onPress={handleResetPassword}>
             <Text style={styles.buttonText}>Reset Password</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
-    </ImageBackground>
+        </ScrollView>  
+     </ImageBackground>
   );
 };
 
@@ -93,3 +97,4 @@ const styles = StyleSheet.create({
 });
 
 export default ForgotPasswordScreen;
+

@@ -1,27 +1,22 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-<<<<<<< Updated upstream
-import { MaterialIcons, AntDesign } from '@expo/vector-icons'; 
-//import { NavigationContainer } from "@react-navigation/native";
-//import { MaterialIcons, AntDesign } from '@expo/vector-icons'; // Import AntDesign from expo/vector-icons
-=======
-import { MaterialIcons, AntDesign, } from '@expo/vector-icons'; // Import AntDesign from expo/vector-icons
->>>>>>> Stashed changes
+import { MaterialIcons, AntDesign,FontAwesome5 } from '@expo/vector-icons'; 
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from '@react-navigation/stack';
+import HistoryScreen from './Screens/components/HistoryScreen';
 import PhotoScreen from './Screens/components/PhotoScreen';
 import VideoScreen from './Screens/components/VideoScreen';
 import AudioScreen from './Screens/components/AudioScreen';
 import DocumentScreen from './Screens/components/Document';
 import SendRequestScreen from './Screens/SendRequestScreen';
 import ReceiveScreen from './Screens/ReceiveScreen';
+import NewCloudScreen from './Screens/components/NewCloudScreen';
 import CloudScreen from './Screens/components/CloudScreen';
 import LoginScreen from './Screens/components/LoginScreen';
 import SignupScreen from './Screens/components/SignUpScreen';
 import VerificationScreen from './Screens/components/VerificationScreen';
-
-
+import ForgotPasswordScreen from './Screens/components/ForgotPasswordScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -44,32 +39,40 @@ const MainTapNavigator = () => {
           let iconName;
           const size = 33
           switch (route.name) {
+            case 'History':
+            iconName='history'
+            break;
             case 'Photo':
               iconName = 'photo';
               break;
+
             case 'Video':
               iconName = 'videocam';
               break;
             case 'Audio':
               iconName = 'audiotrack';
-              break;
+          break;
             case 'Document':
               iconName = 'description';
               break;
           }
 
           return <MaterialIcons name={iconName} size={size} color={color} />;
+     
         },
       })}
       tabBarOptions={{
         activeTintColor: '#004d40',
-        inactiveTintColor: 'gray',
+        inactiveTintColor: 'grey',
+        
       }}
     >
+      
       <Tab.Screen name="Photo" component={PhotoScreen} />
       <Tab.Screen name="Video" component={VideoScreen} />
       <Tab.Screen name="Audio" component={AudioScreen} />
       <Tab.Screen name="Document" component={DocumentScreen} />
+      <Tab.Screen name="History" component={HistoryScreen}/>
     </Tab.Navigator>
   )
 }
@@ -79,6 +82,9 @@ const MainStackNavigator = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
+
+      
+
         <Stack.Screen
           options={{
             headerShown: false
@@ -86,6 +92,9 @@ const MainStackNavigator = () => {
           name='MainTapNavigtor'
           component={MainTapNavigator}
         />
+
+
+
         <Stack.Screen
           options={{
             headerShown: false
@@ -101,6 +110,13 @@ const MainStackNavigator = () => {
         name='ReceiveScreen'
         component={ReceiveScreen}
         />
+
+<Stack.Screen
+      options={{headerShown:false}}
+name="NewCloudScreen"
+component={NewCloudScreen}
+/>  
+
 
         <Stack.Screen 
         options={{
@@ -126,13 +142,20 @@ const MainStackNavigator = () => {
         component={LoginScreen}
         />
 
+<Stack.Screen
+options={{headerShown:false}}
+name="ForgotPassword" component={ForgotPasswordScreen}/>
+
+
+
+
         <Stack.Screen 
         options={{
           headerShown: false
         }}
         name='CloudScreen'
         component={CloudScreen}
-        />
+        />  
       </Stack.Navigator> 
     </NavigationContainer>
 
@@ -156,5 +179,3 @@ const styles = StyleSheet.create({
 });
 
 export default App;
-
-

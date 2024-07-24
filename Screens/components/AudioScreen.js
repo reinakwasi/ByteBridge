@@ -333,6 +333,11 @@ import { getAudioType } from '../../utils';
 import ProfileButton from '../../components/ProfileComponent';
 import { handleShare } from '../../utils';
 import { RadioButton } from 'react-native-paper';
+//import Checkbox from '@react-native-community/checkbox';
+import Checkbox from 'expo-checkbox';
+
+
+
 
 export default function AudioScreen() {
   const [audioFiles, setAudioFiles] = useState([]);
@@ -364,18 +369,13 @@ export default function AudioScreen() {
 
     return (
       <View>
-<<<<<<< Updated upstream
-        <View style={styles.shuffleButtonContainer}>
-          <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
-            <AntDesign name="swap" size={32} color="white" />
-=======
       <View style={styles.shuffleButtonContainer}>
         <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
           <AntDesign name="swap" size={32} color="white" />
         </TouchableOpacity>
       </View>
 
-      {showPopUp && (
+      {/* {showPopUp && (
         <View style={styles.popUpContainer}>
           <TouchableOpacity style={styles.popUpButton} onPress={handleSendOnPress}>
             <AntDesign name="upload" size={24} color="white" />
@@ -385,9 +385,8 @@ export default function AudioScreen() {
           <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("ReceiveScreen")}>
             <AntDesign name="download" size={24} color="white" />
             <Text style={styles.popUpText}>Receive</Text>
->>>>>>> Stashed changes
           </TouchableOpacity>
-        </View>
+        </View> */}
 
         {showPopUp && (
           <View style={styles.popUpContainer}>
@@ -470,19 +469,10 @@ export default function AudioScreen() {
           <Text style={styles.title}>{item.filename}</Text>
           <Text style={styles.size}>{fileSizeMB}</Text>
         </TouchableOpacity>
-<<<<<<< Updated upstream
-        <RadioButton
-          value={item.id}
-          status={isSelected(item) ? 'checked' : 'unchecked'}
-          onPress={() => handleSelectFile(item)}
-          uncheckedColor="#000"
-          color="rgb(53,189,153)"
-=======
         <Checkbox
           style = {{borderRadius: 50}}
           value={selectedFiles.includes(item)}
           onValueChange={() => handleSelectFile(item)}
->>>>>>> Stashed changes
         />
       </View>
     );
@@ -646,13 +636,8 @@ const styles = StyleSheet.create({
   },
 
   popUpButton: {
-<<<<<<< Updated upstream
-    backgroundColor: 'rgb(53,189,153)',
-    padding: 8, // Navigate to SendRequestScreen
-=======
     backgroundColor: '#004d40',
     padding: 8,// Navigate to SendRequestScreen
->>>>>>> Stashed changes
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',

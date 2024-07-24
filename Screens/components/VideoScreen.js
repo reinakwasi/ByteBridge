@@ -8,6 +8,10 @@ import { getVideoType } from '../../utils';
 import { AntDesign } from '@expo/vector-icons';
 import ProfileButton from '../../components/ProfileComponent';
 import { handleShare } from '../../utils';
+//import Checkbox from '@react-native-community/checkbox';
+import Checkbox from 'expo-checkbox';
+
+
 
 export default function VideoScreen() {
   const [videoFiles, setVideoFiles] = useState([]);
@@ -38,18 +42,13 @@ export default function VideoScreen() {
     }
 
     return (
-      <View>
-<<<<<<< Updated upstream
-        <View style={styles.shuffleButtonContainer}>
-          <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
-            <AntDesign name="swap" size={32} color="white" />
-=======
+          <View>
       <View style={styles.shuffleButtonContainer}>
         <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
           <AntDesign name="swap" size={32} color="white" />
         </TouchableOpacity>
       </View>
-
+{/* 
       {showPopUp && (
         <View style={styles.popUpContainer}>
           <TouchableOpacity style={styles.popUpButton} onPress={handleSendOnPress}>
@@ -60,10 +59,9 @@ export default function VideoScreen() {
           <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("ReceiveScreen")}>
             <AntDesign name="download" size={24} color="white" />
             <Text style={styles.popUpText}>Receive</Text>
->>>>>>> Stashed changes
           </TouchableOpacity>
-        </View>
-
+        </View> */}
+  
         {showPopUp && (
           <View style={styles.popUpContainer}>
             <TouchableOpacity style={styles.popUpButton} onPress={handleSendOnPress}>
@@ -79,8 +77,8 @@ export default function VideoScreen() {
         )}
       </View>
     )
-  }
-
+    }
+  
   useEffect(() => {
     const getPermissions = async () => {
       const { status } = await MediaLibrary.requestPermissionsAsync();
@@ -144,19 +142,17 @@ export default function VideoScreen() {
       <View style={styles.itemContainer}>
         <TouchableOpacity style={styles.thumbnailContainer} onPress={() => handleVideoPress(item.uri)}>
           <Image source={{ uri: item.uri }} style={styles.thumbnail} />
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={[styles.radioButton, isItemSelected && styles.radioButtonSelectedBorder]}
             onPress={() => handleSelectFile(item)}
           >
             {isItemSelected && <View style={styles.radioButtonSelected} />}
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </TouchableOpacity>
         <View style={styles.details}>
           <Text style={styles.title}>{item.filename}</Text>
           <Text style={styles.size}>{fileSizeMB}</Text>
         </View>
-<<<<<<< Updated upstream
-=======
         <View style={styles.checkboxContainer}>
         <Checkbox
           style={{borderRadius: 50, borderColor:"rgb(211, 211, 211)"}}
@@ -164,7 +160,6 @@ export default function VideoScreen() {
           onValueChange={() => handleSelectFile(item)}
           />
         </View>
->>>>>>> Stashed changes
       </View>
     );
   };
@@ -260,10 +255,7 @@ const styles = StyleSheet.create({
   searchBar: {
     flex: 1,
     marginHorizontal: 10,
-<<<<<<< Updated upstream
-=======
     // marginEnd: 50,
->>>>>>> Stashed changes
     marginEnd: 10,
     borderRadius: 10,
     padding: 8,
@@ -313,31 +305,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#d9d9d9',
   },
-<<<<<<< Updated upstream
-  radioButton: {
-    position: 'absolute',
-    top: 5,
-    right: 5,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: 'white',
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  radioButtonSelected: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: 'rgb(53, 189, 153)',
-  },
-  radioButtonSelectedBorder: {
-    borderColor: 'rgb(53, 189, 153)', // Change border color when selected
-    
-  },
-=======
 
   checkboxContainer:{
     position: 'absolute',
@@ -346,7 +313,6 @@ const styles = StyleSheet.create({
   },
   
 
->>>>>>> Stashed changes
   details: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -413,13 +379,8 @@ const styles = StyleSheet.create({
   },
 
   popUpButton: {
-<<<<<<< Updated upstream
-    backgroundColor: 'rgb(53,189,153)',
-    padding: 8, // Navigate to SendRequestScreen
-=======
     backgroundColor: '#004d40',
     padding: 8,// Navigate to SendRequestScreen
->>>>>>> Stashed changes
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',

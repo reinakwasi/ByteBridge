@@ -45,6 +45,8 @@ const CloudScreen = () => {
         const data = await response.json();
         console.log(data)
         setContentList(data);
+
+
       } else if (response.status==401){
         navigation.navigate("LoginScreen")
       }
