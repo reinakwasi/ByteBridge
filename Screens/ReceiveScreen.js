@@ -1,6 +1,7 @@
 import React, { useState, useEffect, } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, Button, Alert, FlatList, Pressable, ImageBackground } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import { TouchableOpacity } from 'react-native';
 import ProfileButton from '../components/ProfileComponent';
 import { FileSystem, shareAsync } from 'expo';
 import { Platform } from 'react-native';
@@ -151,7 +152,7 @@ const ReceiveScreen = () => {
 
 
   return (
-    <ImageBackground source={require('../assets/byte.jpg')} style={styles.container}>
+    <View style={styles.container}>
       {showRecievedFiles ? (
         isLoading ? (
           <View>
@@ -162,12 +163,14 @@ const ReceiveScreen = () => {
             <ReceiveLoader />
           </View>
         ) : (
+          <View>
           <FlatList 
             data={receiveFiles} 
             renderItem={renderItem} 
             keyExtractor={item => item.file_name}
             showsVerticalScrollIndicator={false}
           />
+          </View>
         )
       ) : (
         <View>
@@ -188,7 +191,7 @@ const ReceiveScreen = () => {
           {/* {scannedData ? <Text>{scannedData}</Text> : null} */}
         </View>
       )}
-    </ImageBackground>
+    </View>
   );
 }
   
@@ -196,6 +199,7 @@ const ReceiveScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop:20,
     flexDirection: 'column',
     justifyContent: 'center',
     backgroundColor: "rgb(210, 255, 255)",

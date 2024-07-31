@@ -74,7 +74,7 @@ export const handleShare = async (file, fileType) => {
         type: fileType(file.filename),
         name: file.filename,
       });
-      formData.append('share_channel_id', share_channel_id)
+      formData.append('share_channel_id', 233)
   
       const response = await axios.post(shareEndpoint, formData, {
         headers: {
@@ -83,9 +83,11 @@ export const handleShare = async (file, fileType) => {
       });
   
       console.log('Upload successful:', response.data);
+      // return response.data
       // Handle success, navigate, or update state as needed
     } catch (error) {
       console.error('Error uploading image:', error);
+      // return "File sharing failed"
       // Handle error, show error message, etc.
     }
   };
