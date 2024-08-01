@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { MaterialIcons, AntDesign,FontAwesome5 } from '@expo/vector-icons'; 
+import { MaterialIcons, AntDesign, FontAwesome5 } from '@expo/vector-icons';
 import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from '@react-navigation/stack';
 import HistoryScreen from './Screens/components/HistoryScreen';
@@ -17,6 +17,7 @@ import LoginScreen from './Screens/components/LoginScreen';
 import SignupScreen from './Screens/components/SignUpScreen';
 import VerificationScreen from './Screens/components/VerificationScreen';
 import ForgotPasswordScreen from './Screens/components/ForgotPasswordScreen';
+import ViewCloudDataScreen from './Screens/components/ViewCloudDataScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -29,19 +30,19 @@ const MainTapNavigator = () => {
           borderTopWidth: 0,
           height: 73,
           paddingTop: 12,
-          backgroundColor:"rgb(247, 255, 255)",
+          backgroundColor: "rgb(247, 255, 255)",
           // borderTopEndRadius:150,
-          elevation:32,
+          elevation: 32,
           paddingBottom: 12,
         },
         headerShown: false,
-        tabBarIcon: ({ color}) => {
+        tabBarIcon: ({ color }) => {
           let iconName;
           const size = 33
           switch (route.name) {
             case 'History':
-            iconName='history'
-            break;
+              iconName = 'history'
+              break;
             case 'Photo':
               iconName = 'photo';
               break;
@@ -51,28 +52,28 @@ const MainTapNavigator = () => {
               break;
             case 'Audio':
               iconName = 'audiotrack';
-          break;
+              break;
             case 'Document':
               iconName = 'description';
               break;
           }
 
           return <MaterialIcons name={iconName} size={size} color={color} />;
-     
+
         },
       })}
       tabBarOptions={{
         activeTintColor: '#004d40',
         inactiveTintColor: 'grey',
-        
+
       }}
     >
-      
+
       <Tab.Screen name="Photo" component={PhotoScreen} />
       <Tab.Screen name="Video" component={VideoScreen} />
       <Tab.Screen name="Audio" component={AudioScreen} />
       <Tab.Screen name="Document" component={DocumentScreen} />
-      <Tab.Screen name="History" component={HistoryScreen}/>
+      <Tab.Screen name="History" component={HistoryScreen} />
     </Tab.Navigator>
   )
 }
@@ -83,7 +84,7 @@ const MainStackNavigator = () => {
     <NavigationContainer>
       <Stack.Navigator>
 
-      
+
 
         <Stack.Screen
           options={{
@@ -103,60 +104,68 @@ const MainStackNavigator = () => {
           component={SendRequestScreen}
         />
 
-        <Stack.Screen 
-         options={{
-          headerShown: false
-        }}
-        name='ReceiveScreen'
-        component={ReceiveScreen}
+        <Stack.Screen
+          options={{
+            headerShown: false
+          }}
+          name='ReceiveScreen'
+          component={ReceiveScreen}
         />
 
-<Stack.Screen
-      options={{headerShown:false}}
-name="NewCloudScreen"
-component={NewCloudScreen}
-/>  
-
-
-        <Stack.Screen 
-        options={{
-          headerShown: false
-        }}
-        name='SignupScreen'
-        component={SignupScreen}
+        <Stack.Screen
+          options={{
+            headerShown: false
+          }}
+          name='ViewCloudDataScreen'
+          component={ViewCloudDataScreen}
         />
 
-        <Stack.Screen 
-        options={{
-          headerShown: false
-        }}
-        name='VerificationScreen'
-        component={VerificationScreen}
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name="NewCloudScreen"
+          component={NewCloudScreen}
         />
 
-        <Stack.Screen 
-        options={{
-          headerShown: false
-        }}
-        name='LoginScreen'
-        component={LoginScreen}
+
+        <Stack.Screen
+          options={{
+            headerShown: false
+          }}
+          name='SignupScreen'
+          component={SignupScreen}
         />
 
-<Stack.Screen
-options={{headerShown:false}}
-name="ForgotPassword" component={ForgotPasswordScreen}/>
+        <Stack.Screen
+          options={{
+            headerShown: false
+          }}
+          name='VerificationScreen'
+          component={VerificationScreen}
+        />
+
+        <Stack.Screen
+          options={{
+            headerShown: false
+          }}
+          name='LoginScreen'
+          component={LoginScreen}
+        />
+
+        <Stack.Screen
+          options={{ headerShown: false }}
+          name="ForgotPassword" component={ForgotPasswordScreen} />
 
 
 
 
-        <Stack.Screen 
-        options={{
-          headerShown: false
-        }}
-        name='CloudScreen'
-        component={CloudScreen}
-        />  
-      </Stack.Navigator> 
+        <Stack.Screen
+          options={{
+            headerShown: false
+          }}
+          name='CloudScreen'
+          component={CloudScreen}
+        />
+      </Stack.Navigator>
     </NavigationContainer>
 
   )

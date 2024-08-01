@@ -26,7 +26,6 @@ const CloudLoader = (props) => {
   
   
     lottieIndicator: {
-      // fontFamily:',
       width: 400,
       height: 400
     }

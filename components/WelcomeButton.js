@@ -2,10 +2,10 @@ import { StyleSheet, Text, View, Pressable, Button } from 'react-native'
 import React from 'react'
 
 const WelcomeButton = (props) => {
-    const { onPress } = props
+    const { onPress, message } = props
   return (
     <Pressable style={styles.button} onPress={onPress}>
-      <Text style={styles.text}>Start Your Cloud Storage</Text>
+      <Text style={styles.text}>{message}</Text>
     </Pressable>
   )
 }
@@ -17,6 +17,7 @@ const styles = StyleSheet.create({
         backgroundColor:"#004d40",
         width:300,
         height: 50,
+        marginTop: 12,
         alignItems: "center",
         justifyContent: "center",
         borderRadius: 12,

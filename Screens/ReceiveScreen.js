@@ -3,11 +3,15 @@ import { View, Text, StyleSheet, ActivityIndicator, Button, Alert, FlatList, Pre
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { TouchableOpacity } from 'react-native';
 import ProfileButton from '../components/ProfileComponent';
-import { FileSystem, shareAsync } from 'expo';
-import { Platform } from 'react-native';
+import { shareAsync } from "expo-sharing";
+import { Platform, Modal } from 'react-native';
 import ReceiveLoader from '../components/RecieveLoader';
+import * as FileSystem from 'expo-file-system'
+import { MaterialIcons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
+import { useNavigation } from '@react-navigation/native';
 
-let  SHARE_SERVER_URL = ""
+let SHARE_SERVER_URL = ""
 
 const ReceiveScreen = () => {
   const [hasPermission, setHasPermission] = useState(null);
@@ -17,40 +21,56 @@ const ReceiveScreen = () => {
   const [scannedData, setScannedData] = useState('');
   const [receiveFiles, setReceiveFiles] = useState([]);
   const [isLoading, setLoading] = useState(false)
+  const [loading, setRLoading] = useState(false);
   const [message, setMessage] = useState("Connecting")
 
-  async function saveFile(uri, filename, mimetype) {
-    if (Platform.OS === "android") {
-      const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-  
-      if (permissions.granted) {
-        const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
-  
-        await FileSystem.StorageAccessFramework.createFileAsync(permissions.directoryUri, filename, mimetype)
-          .then(async (uri) => {
-            await FileSystem.writeAsStringAsync(uri, base64, { encoding: FileSystem.EncodingType.Base64 });
-          })
-          .catch(e => console.log(e));
-      } else {
-        shareAsync(uri);
-      }
-    } else {
-      shareAsync(uri);
+  const navigation = useNavigation()
+
+  const save = async (uri, filename, mimetype) => {
+    const permission = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync()
+    if (permission.granted) {
+      const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+
+      await FileSystem.StorageAccessFramework.createFileAsync(permission.directoryUri, filename, mimetype)
+        .then(async (uri) => {
+          await FileSystem.writeAsStringAsync(uri, base64, { encoding: FileSystem.EncodingType.Base64 });
+        })
+        .catch(e => console.log(e));
     }
   }
 
-  async function download() {
-    const filename = "dummy.png";
-    const result = await FileSystem.downloadAsync(
-      "https://justgohealth-backend.onrender.com/media/images/default.png",
-      FileSystem.documentDirectory + filename
-    );
-  
-    // Log the download result
-    console.log(result);
-  
-    // Save the downloaded file
-    saveFile(result.uri, filename, result.headers["Content-Type"]);
+
+  const ViewData = (item) => {
+    const fileUrl = `https:${item.file_url.split(':').pop()}`
+    navigation.navigate("ViewCloudDataScreen", { fileUrl: fileUrl })
+  }
+
+  function getFileName(uri) {
+    return String(uri).split('/').pop()
+  }
+
+  const downloadFile = async (sourceUri) => {
+    const source = String(sourceUri)
+    setRLoading(true)
+    console.log("src", source)
+    if (Platform.OS == "android") {
+      FileSystem.downloadAsync(
+        source,
+        FileSystem.documentDirectory + getFileName(source)
+      )
+        .then((result) => {
+          console.log(result)
+          console.log(result.uri, getFileName(result.uri), result.headers["content-type"])
+          save(result.uri, getFileName(result.uri), result.headers["content-type"])
+          console.log("ok", result)
+          setRLoading(false)
+        })
+        .catch((err) => {
+          console.log("ERR", err)
+          setRLoading(false)
+        })
+    }
+    shareAsync(sourceUri)
   }
 
   useEffect(() => {
@@ -69,61 +89,57 @@ const ReceiveScreen = () => {
     setLoading(true)
 
     SHARE_SERVER_URL = data
-    console.log(data)
+    console.log("data", data)
     const ws = new WebSocket(SHARE_SERVER_URL);
     // download()
     console.log(data)
 
     ws.onopen = () => {
-      console.log('WebSocket connection opened');
+      console.log('recieve scrren ready');
       setMessage("Waiting to receive files");
       Alert.alert("Connection has been made")
-      };
+    };
 
-      ws.onmessage = (event) => {
-        setLoading(false);
-        const receivedData = JSON.parse(event.data);
-  
-        Alert.alert(
-          'Incoming File',
-          `Accept file ${String(receivedData.file_name).slice(6)}?`,
-          [
-            {
-              text: 'Reject',
-              style: 'cancel',
-              onPress: () => {
-                console.log('File rejected');
-                // Optionally send rejection message to backend
-              },
+    ws.onmessage = (event) => {
+      setLoading(false);
+      const receivedData = JSON.parse(event.data);
+      const fileUrl = `https:${receivedData.file_url.split(':').pop()}`
+      console.log("message", fileUrl)
+      Alert.alert(
+        'Incoming File',
+        `Accept file ${String(receivedData.file_name).slice(6)}?`,
+        [
+          {
+            text: 'Reject',
+            style: 'cancel',
+            onPress: () => {
+              console.log('File rejected');
             },
-            {
-              text: 'Accept',
-              onPress: () => {
-                console.log('File accepted');
-                console.log(receivedData)
-                setReceiveFiles(prevFiles => [...prevFiles, receivedData]);
-                // initiateFileProcessing(data);      // serverMessagesList.push(e.data);
-              },
+          },
+
+          {
+            text: 'Accept',
+            onPress: async () => {
+              setReceiveFiles(prevFiles => [...prevFiles, receivedData]);
+              await downloadFile(fileUrl)
             },
-          ],
-          { cancelable: false }
-            );
-      };
-  
-      ws.onerror = (error) => {
-        console.error('WebSocket Error:', error.message);
-        setMessage("WebSocket error occurred");
-        setLoading(false);
-      };
-  
-      ws.onclose = (event) => {
-        console.log('WebSocket closed:', event.code, event.reason);
-        setMessage("WebSocket connection closed");
-        setLoading(false);
-      };
-  
-  
-      
+          },
+        ],
+        { cancelable: false }
+      );
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket Error:', error.message);
+      setMessage("WebSocket error occurred");
+      setLoading(false);
+    };
+
+    ws.onclose = (event) => {
+      console.log('WebSocket closed:', event.code, event.reason);
+      setMessage("WebSocket connection closed");
+      setLoading(false);
+    };
   };
 
   if (hasPermission === null) {
@@ -133,43 +149,46 @@ const ReceiveScreen = () => {
     return <Text>No access to camera</Text>;
   }
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => audioOnPress(item)} style={styles.container}>
+  const renderItem = ({ item }) => {
+    return (
       <View style={styles.itemContainer}>
-        <Text style={styles.filename}>{item.file_name}</Text>
-        {/* <TouchableOpacity onPress={() => audioOnPress(item)} style={styles.playButton}>
-          <Icon
-            type='antdesign'
-            name={"play"} // Assuming 'playing' state is handled elsewhere
-            size={24}
-            color="black"
-          />
-        </TouchableOpacity> */}
-        {/* <Text style={styles.duration}>{item.duration}</Text> */}
+        <TouchableOpacity
+          style={{ marginRight: 20 }}
+          onPress={() => ViewData(item)}>
+          <MaterialIcons name={"file-open"} size={33} color={'#004d40'} />
+        </TouchableOpacity>
+
+
+        <TouchableOpacity
+          onPress={() => ViewData(item)}
+        >
+          <Text style={styles.title}>{item.file_name}</Text>
+        </TouchableOpacity>
       </View>
-    </TouchableOpacity>
-  );
+    )
+  }
 
 
   return (
-    <View style={styles.container}>
+    <ImageBackground source={require('../assets/byte.jpg')} style={styles.container}>
       {showRecievedFiles ? (
         isLoading ? (
           <View>
             <View style={styles.profileContainer} >
-            <ProfileButton />
-            <Text style={styles.profileText}>Me</Text>
+              <ProfileButton />
+              <Text style={styles.profileText}>Me</Text>
             </View>
-            <ReceiveLoader />
+            <ReceiveLoader message={"Waiting To Recieve Files"} />
           </View>
         ) : (
-          <View>
-          <FlatList 
-            data={receiveFiles} 
-            renderItem={renderItem} 
-            keyExtractor={item => item.file_name}
-            showsVerticalScrollIndicator={false}
-          />
+          <View style={{ padding: 12, paddingTop: 240, }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Recieve Files</Text>
+            <FlatList
+              data={receiveFiles}
+              renderItem={renderItem}
+              keyExtractor={item => item.file_name}
+              showsVerticalScrollIndicator={false}
+            />
           </View>
         )
       ) : (
@@ -188,18 +207,26 @@ const ReceiveScreen = () => {
               <Text style={styles.buttonText}>Tap to Scan Again</Text>
             </Pressable>
           )}
-          {/* {scannedData ? <Text>{scannedData}</Text> : null} */}
         </View>
       )}
-    </View>
+
+      <Modal visible={loading} transparent animationType="fade">
+        <BlurView intensity={90} tint="light" style={styles.blurContainer}>
+          <View style={styles.modalContainer}>
+            <ActivityIndicator size={60} color="#004d40" />
+            <Text style={styles.text}>Receiving...</Text>
+          </View>
+        </BlurView>
+      </Modal>
+    </ImageBackground>
   );
 }
-  
+
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop:20,
+    paddingTop: 20,
     flexDirection: 'column',
     justifyContent: 'center',
     backgroundColor: "rgb(210, 255, 255)",
@@ -207,7 +234,7 @@ const styles = StyleSheet.create({
   },
 
   buttonStyle: {
-    backgroundColor:"rgb(53,189,153)",
+    backgroundColor: "rgb(53,189,153)",
     width: 200,
     height: 50,
     justifyContent: "center",
@@ -221,7 +248,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginTop: 40,
     width: 330,
-    alignItems:"center",
+    alignItems: "center",
     padding: 30,
     borderRadius: 35,
     shadowColor: '#000',
@@ -232,30 +259,76 @@ const styles = StyleSheet.create({
   },
 
   description: {
-    fontSize:20,
-    textAlign:"center",
-    marginTop:12
+    fontSize: 20,
+    textAlign: "center",
+    marginTop: 12
   },
 
-  profileContainer:{
+  profileContainer: {
     display: "flex",
     flexDirection: "column",
-    alignItems:"center"
+    alignItems: "center"
   },
 
   profileText: {
-    fontWeight:"600"
+    fontWeight: "600"
   },
 
-  buttonText:{
-    fontSize:20
+  buttonText: {
+    fontSize: 20
   },
 
-  scanner:{
-    height:300,
+  scanner: {
+    height: 300,
     width: 300,
     // padding: 12
-  }
+  },
+
+  title: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    textAlign:"center",
+    color: '#333',
+  },
+
+  blurContainer: {
+    flex: 1,
+    padding: 20,
+    margin: 16,
+    textAlign: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    borderRadius: 20,
+  },
+
+  text: {
+    marginTop: 130,
+    fontSize: 24,
+    color: "#004d40",
+    fontWeight: '600',
+  },
+
+  modalContainer: {
+    flex: 1,
+    // backgroundColor: "red",
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  itemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    paddingRight: 100,
+    marginTop: 12,
+    height: 75,
+    // width:"auto",
+    borderRadius: 12,
+    borderBottomWidth: 1,
+    backgroundColor: "#88fdc7",
+    // borderBottomColor: '#f0f0f0',
+  },
+
 });
 
 export default ReceiveScreen;

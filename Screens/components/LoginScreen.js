@@ -17,6 +17,9 @@ const LoginScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [loginError, setLoginError] = useState(false)
+  const [loginSuccess, setLoginSuccess] = useState(false)
+  const [loginSuccessMessage, setLoginSuccessMessage] = useState("")
+  const [optSent, setOptSent] = useState(false)
   const [loginErrorMessage, setLoginErrorMessage] = useState("")
 
   // const navigation = useNavigation()
@@ -24,47 +27,66 @@ const LoginScreen = ({ navigation }) => {
   const validate = () => {
     const newErrors = {};
     if (!emailOrUsername) newErrors.emailOrUsername = 'Email or Username is required';
-    if (!password) newErrors.password = 'Password is required';
+    // if (!password) newErrors.password = 'Password is required';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleLogin = async () => {
-
-    if (!validate()) return;
-    var data = { 
+    setLoading(true)
+    var data = {
       email: emailOrUsername,
       password: password
-          }
-
-    console.log(data)
-    setLoading(true)
+    }
     await axios.post(`${BACKEND_URL}/accounts/login/`, data)
-    .then((res)=>{
-    setLoading(false)
-    if (res.status ==200){
-      console.log(res.data)
-      access_token = res.data['access']
-      storage.setItem('token', access_token)
-      console.log(res.data)
-      navigation.navigate('CloudScreen', {access_token:access_token})
+      .then((res) => {
+        setLoading(false)
+        console.log(res.data)
+        access_token = res.data['access']
+        storage.setItem('token', access_token)
+        console.log(res.data)
+        navigation.navigate('CloudScreen', { access_token: access_token })
+      })
+      .catch((err) => {
+        setLoading(false) 
+        setLoginError(true)
+        setLoginErrorMessage("User authentication failed")
+        console.log(err)
+      })
     }
-    else if (res.status = 401) {
-      setLoginErrorMessage("Credetials Invalid")
-      console.log(res.data)
-    }
-    })
-    .catch((err)=>{
-      setLoading(false)
-      setLoginError(true)
-      setLoginErrorMessage("Credetials Invalid")
-      console.log(err)
-    })
-  
+
+    const handleOtp = async () => {
+      console.log("Requesting otp")
+      if (!validate()) return;
+      var data = {
+        email: emailOrUsername,
+      }
+
+      console.log(data)
+      setLoading(true)
+      await axios.post(`${BACKEND_URL}/accounts/otp/`, data)
+        .then((res) => {
+          console.log(res)
+
+          setLoading(false)
+          setOptSent(true)
+          setLoginSuccess(true)
+          setLoginSuccessMessage(res.data.detail)
+        }
+        )
+        .catch((err) => {
+          setLoading(false)
+          setLoginError(true)
+          setLoginErrorMessage("User does not exists")
+          console.log(err)
+        })
+
+
+
+    };
 
     // Implement login logic here
     // console.log('Logging in with:', emailOrUsername, password);
-  };
 
   return (
     <ImageBackground source={require('../../assets/byte.jpg')} style={styles.backgroundImage}>
@@ -79,46 +101,51 @@ const LoginScreen = ({ navigation }) => {
                 <Text style={styles.switchText}>Sign up</Text>
               </TouchableOpacity>
             </View>
+            {loginSuccess && <Text style={styles.successText}>{loginSuccessMessage}</Text>}
+            {loginError && <Text style={styles.errorText}>{loginErrorMessage}</Text>}
             <View style={styles.inputContainer}>
               <TextInput
-                placeholder="Email or Username"     
+                placeholder="Enter your email"
                 style={[styles.input, errors.emailOrUsername && styles.inputError]}
                 value={emailOrUsername}
                 onChangeText={setEmailOrUsername}
               />
               {errors.emailOrUsername && <Text style={styles.errorText}>{errors.emailOrUsername}</Text>}
             </View>
-            <View style={styles.inputContainer}>
-              <TextInput
-                placeholder="Password"
-                secureTextEntry={true}
-                style={[styles.input, errors.password && styles.inputError]}
-                value={password}
-                onChangeText={setPassword}
-              />
-              {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
-            </View>
-            <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
-              <Text style={styles.forgotPassword}>Forgot Password?</Text>
-            </TouchableOpacity>
-            {loginError && <Text style={styles.errorText}>{loginErrorMessage}</Text>}
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-              <Text style={styles.buttonText}>Login</Text>
-            </TouchableOpacity>
-            
+            {optSent ?
+              (<>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    placeholder="Enter OTP"
+                    secureTextEntry={true}
+                    style={[styles.input, errors.password && styles.inputError]}
+                    value={password}
+                    onChangeText={setPassword}
+                  />
+                  {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+                </View>
+                <TouchableOpacity style={styles.button} onPress={handleLogin}>
+                  <Text style={styles.buttonText}>Login</Text>
+                </TouchableOpacity>
+              </>) : (
+                <TouchableOpacity style={styles.button} onPress={handleOtp}>
+                  <Text style={styles.buttonText}>Request OTP</Text>
+                </TouchableOpacity>
+              )}
+        
           </View>
         </View>
       </ScrollView>
 
       <Modal visible={loading} transparent animationType="fade">
-      <BlurView intensity={90} tint="light" style={styles.blurContainer}>
-      <View style={styles.modalContainer}>
-        {/* <GeneralLoader /> */}
-        {/* <ReceiveLoader /> */}
-          <ActivityIndicator size={60} color="#004d40" />
-          {/* <Text style={styles.text}>loading...</Text> */}
-        </View>
-      </BlurView>
+        <BlurView intensity={90} tint="light" style={styles.blurContainer}>
+          <View style={styles.modalContainer}>
+            {/* <GeneralLoader /> */}
+            {/* <ReceiveLoader /> */}
+            <ActivityIndicator size={60} color="#004d40" />
+            {/* <Text style={styles.text}>loading...</Text> */}
+          </View>
+        </BlurView>
       </Modal>
 
     </ImageBackground>
@@ -203,6 +230,16 @@ const styles = StyleSheet.create({
     marginTop: -25,
     marginBottom: 10,
     paddingTop: 2,
+    paddingLeft: 12,
+    paddingBottom: 12,
+  },
+
+  successText: {
+    color: 'green',
+    marginTop: -25,
+    marginBottom: 10,
+    paddingTop: 5,
+    paddingLeft: 12,
     paddingBottom: 12,
   },
   forgotPassword: {
@@ -223,15 +260,15 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
   },
- 
+
   LoginText: {
     fontSize: 16,
     color: '#aaa',
     marginBottom: 20,
     textAlign: 'center',
-    paddingBottom:10,
+    paddingBottom: 10,
   },
-  
+
   blurContainer: {
     flex: 1,
     padding: 20,

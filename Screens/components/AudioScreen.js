@@ -323,7 +323,7 @@
 
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, TextInput, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Modal, Text, ActivityIndicator, FlatList, Image, TextInput, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import { Audio } from 'expo-av';
 import * as MediaLibrary from 'expo-media-library';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -332,10 +332,10 @@ import { useNavigation } from '@react-navigation/native';
 import { getAudioType } from '../../utils';
 import ProfileButton from '../../components/ProfileComponent';
 import { handleShare } from '../../utils';
-import { RadioButton } from 'react-native-paper';
+import { BlurView } from 'expo-blur';
+import { RadioButton, } from 'react-native-paper';
 //import Checkbox from '@react-native-community/checkbox';
 import Checkbox from 'expo-checkbox';
-
 
 
 
@@ -343,8 +343,10 @@ export default function AudioScreen() {
   const [audioFiles, setAudioFiles] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [sending, setSending] = useState(false)
   const [sound, setSound] = useState(null);
   const [playingUri, setPlayingUri] = useState(null);
+  const [filename, setFilename] = useState(null)
   const [selectAll, setSelectAll] = useState(false);
 
   const ShuffleButtonComponent = () => {
@@ -357,14 +359,24 @@ export default function AudioScreen() {
     };
 
     const handleSendOnPress = () => {
-      if (selectedFiles.length === 0) {
-        navigation.navigate("SendRequestScreen");
+      if (selectedPhotos.length == 0) {
+        navigation.navigate("SendRequestScreen")
+      }   
+      console.log(selectedPhotos)
+      for (var file of selectedPhotos) {
+        setSending(true)
+        setFilename(file.filename)
+        handleShare(file, getAudioType)
+        .then(() => {
+          setSending(false)
+          Alert.alert(`${file.filename} sent`)
+        })
+        .catch(() => {
+          setSending(false)
+          Alert.alert("File sharing failed")
+        })
       }
-      console.log(selectedFiles);
-      for (var file of selectedFiles) {
-        handleShare(file, getAudioType);
-      }
-      console.log("sending");
+      console.log("sending")
     };
 
     return (
@@ -487,6 +499,7 @@ export default function AudioScreen() {
   console.log('Selected audio files:', selectedFiles.length);
 
   return (
+    <>
     <ImageBackground
       // source={require('./assests/byte.jpg')} // Replace with your background image
       style={styles.backgroundImage}
@@ -519,7 +532,20 @@ export default function AudioScreen() {
         />
       </View>
       <ShuffleButtonComponent />
+
     </ImageBackground>
+        <Modal visible={sending} transparent animationType="fade">
+        <BlurView intensity={90} tint="light" style={styles.blurContainer}>
+        <View style={styles.modalContainer}>
+          {/* <GeneralLoader /> */}
+          {/* <ReceiveLoader /> */}
+            <ActivityIndicator size={60} color="#004d40" />
+            <Text style={styles.text}>Sending...</Text>
+            <Text style={styles.text}>{filename}</Text>
+          </View>
+        </BlurView>
+        </Modal>
+    </>
   );
 }
 

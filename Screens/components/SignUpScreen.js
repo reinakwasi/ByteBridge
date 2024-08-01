@@ -1,14 +1,16 @@
 // SignupScreen.js
 import React, { useState } from 'react';
-import { View, 
-        TextInput, 
-        TouchableOpacity, 
-        Text, 
-        StyleSheet, 
-        Modal,
-        ImageBackground, 
-        ScrollView, 
-        ActivityIndicator } from 'react-native';
+import {
+  View,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  Modal,
+  ImageBackground,
+  ScrollView,
+  ActivityIndicator
+} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { BACKEND_URL } from '../../env';
 import axios from 'axios';
@@ -16,8 +18,8 @@ import { BlurView } from 'expo-blur';
 import { useNavigation } from '@react-navigation/native';
 
 
-const registrationEndpoint=`${BACKEND_URL}/accounts/signup/`
-const emailVerificationEndpoint=`${BACKEND_URL}/accounts/verify-email/`
+const registrationEndpoint = `${BACKEND_URL}/accounts/signup/`
+const emailVerificationEndpoint = `${BACKEND_URL}/accounts/verify-email/`
 
 const SignupScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -29,7 +31,7 @@ const SignupScreen = ({ navigation }) => {
   const [validationStage, setValidationStage] = useState(true);
   const [start, setStart] = useState(false)
   const [emailCodeSent, setEmailCodeSent] = useState(false)
-  const [submissionEndpoint, setSubmissionEndpoint ] = useState(registrationEndpoint)
+  const [submissionEndpoint, setSubmissionEndpoint] = useState(registrationEndpoint)
   // const navigation = useNavigation()
 
   const validate = () => {
@@ -44,55 +46,19 @@ const SignupScreen = ({ navigation }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleEmailVerification = async () => {
-    console.log("email verification")
-    if (!validate()) return
-    let data = { email: email, code:code}
-    setLoading(true)
-    try {
-      await axios.post(submissionEndpoint, data)
-      .then(res => {
-        if (res.status==200){
-          alert(String(res.data.detail))
-          setSubmissionEndpoint(emailVerificationEndpoint)
-          setEmailCodeSent(true)
-          setLoading(false)
-          let msg = res.data['detail']
-          navigation.navigate("LoginScreen")
-        }
-        else {
-          setLoading(false)
-          alert(String(res.data.detail))
-        }
-      })
-      .catch(function (error) {
-        setLoading(false)
-        console.log(error)
-        alert('Verification failed')
-        // setverificationCodeSent(false)
-        // setregistrationMessage("Email Verification Failed")
-      }
-      )
-    } catch (error) {
-      console.log(error)
-      alert('An error occurred. Please try again.');
-    }
-  };
-
   const handleSignup = async () => {
     console.log("sigup")
     // if (password.length >= 6){
 
     // }
     // if (!validate()) return
-    let data = { email: email, password:password}
+    let data = { email: email }
     console.log(registrationEndpoint)
     setLoading(true)
     // if (validationStage || !validate()) return;
     try {
       await axios.post(registrationEndpoint, data)
-      .then(res => {
-        if (res.status==200){
+        .then(res => {
           alert(String(res.data.detail))
           setSubmissionEndpoint(emailVerificationEndpoint)
           setEmailCodeSent(true)
@@ -100,18 +66,16 @@ const SignupScreen = ({ navigation }) => {
           console.log(res)
           let msg = res.data['detail']
           navigation.navigate("LoginScreen")
-        }else {
-          alert("Sign up failed")
         }
-      })
-      .catch(function (error) {
-        setLoading(false)
-        console.log(error)
-        alert('Sign up failed')
-        // setverificationCodeSent(false)
-        // setregistrationMessage("Email Verification Failed")
-      }
-      )
+        )
+        .catch(function (error) {
+          setLoading(false)
+          console.log(error)
+          alert('Sign up failed')
+          // setverificationCodeSent(false)
+          // setregistrationMessage("Email Verification Failed")
+        }
+        )
     } catch (error) {
       console.log(error)
       alert('An error occurred. Please try again.');
@@ -137,30 +101,13 @@ const SignupScreen = ({ navigation }) => {
               value={email}
               onChangeText={setEmail}
             />
-              {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
-              <TextInput
-                placeholder="Password"
-                secureTextEntry={true}
-                style={[styles.input, errors.password && styles.inputError]}
-                value={password}
-                onChangeText={setPassword}
-              />
-                {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
-              {/* {start &&
-                (<> */}
-                <TextInput
-                  placeholder="Confirm Password"
-                  secureTextEntry={true}
-                  style={[styles.input, errors.confirmPassword && styles.inputError]}
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                />
-                {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword}</Text>}
-                 {/* {start &&
+            {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+            
+            {/* {start &&
                 {/* </>
                 ) */}
-              {/* } */}
-              {/* {emailCodeSent && (
+            {/* } */}
+            {/* {emailCodeSent && (
                 <>
                 {errors.code && <Text style={styles.errorText}>{errors.code}</Text>}
                 <TextInput
@@ -173,7 +120,7 @@ const SignupScreen = ({ navigation }) => {
                 </>
                 )
               } */}
-            
+
             {/* {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword}</Text>}
             {emailCodeSent?
             (<TouchableOpacity style={styles.button} onPress={handleEmailVerification}>
@@ -191,14 +138,14 @@ const SignupScreen = ({ navigation }) => {
       </ScrollView>
 
       <Modal visible={loading} transparent animationType="fade">
-      <BlurView intensity={90} tint="light" style={styles.blurContainer}>
-      <View style={styles.modalContainer}>
-        {/* <GeneralLoader /> */}
-        {/* <ReceiveLoader /> */}
-          <ActivityIndicator size={60} color="#004d40" />
-          {/* <Text style={styles.text}>loading...</Text> */}
-        </View>
-      </BlurView>
+        <BlurView intensity={90} tint="light" style={styles.blurContainer}>
+          <View style={styles.modalContainer}>
+            {/* <GeneralLoader /> */}
+            {/* <ReceiveLoader /> */}
+            <ActivityIndicator size={60} color="#004d40" />
+            {/* <Text style={styles.text}>loading...</Text> */}
+          </View>
+        </BlurView>
       </Modal>
 
     </ImageBackground>
@@ -242,7 +189,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
     },
     modalContainer: {
-      flex: 1,  text: {
+      flex: 1, text: {
         fontSize: 24,
         fontWeight: '600',
       },
@@ -290,10 +237,10 @@ const styles = StyleSheet.create({
   errorText: {
     color: 'red',
     marginTop: -25,
-    marginBottom:10,
-    paddingTop:2,
+    marginBottom: 10,
+    paddingTop: 2,
     paddingLeft: 12,
-    paddingBottom:12,
+    paddingBottom: 12,
   },
 
   button: {
@@ -309,8 +256,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
   },
- 
-  
+
+
 
   blurContainer: {
     flex: 1,
