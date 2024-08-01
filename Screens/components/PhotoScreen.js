@@ -8,16 +8,13 @@ import { handleShare } from '../../utils';
 import { getImageType } from '../../utils';
 import { BlurView } from 'expo-blur';
 import ProfileButton from '../../components/ProfileComponent';
-//import Checkbox from '@react-native-community/checkbox';
 import Checkbox from 'expo-checkbox';
-
-
 
 export default function PhotoScreen() {
   const [photoFiles, setPhotoFiles] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPhotos, setSelectedPhotos] = useState([]);
-  const [viewingPhoto, setViewingPhoto] = useState(null);
+  const [viewingPhotoIndex, setViewingPhotoIndex] = useState(null);
   const [selectAll, setSelectAll] = useState(false);
   const [sending, setSending] = useState(false)
   const panResponder = useRef(null);
@@ -38,19 +35,26 @@ export default function PhotoScreen() {
   useEffect(() => {
     panResponder.current = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        setViewingPhoto(null);
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderRelease: (evt, gestureState) => {
+        if (gestureState.dx > 50) {
+          // Swipe right
+          setViewingPhotoIndex((prevIndex) => Math.max(prevIndex - 1, 0));
+        } else if (gestureState.dx < -50) {
+          // Swipe left
+          setViewingPhotoIndex((prevIndex) => Math.min(prevIndex + 1, photoFiles.length - 1));
+        }
       },
     });
-  }, []);
+  }, [photoFiles]);
 
   const loadPhotoFiles = async () => {
     const media = await MediaLibrary.getAssetsAsync({ mediaType: 'photo' });
     setPhotoFiles(media.assets);
   };
 
-  const handlePhotoPress = (uri) => {
-    setViewingPhoto(uri);
+  const handlePhotoPress = (index) => {
+    setViewingPhotoIndex(index);
   };
 
   const handleSelectPhoto = (item) => {
@@ -65,8 +69,42 @@ export default function PhotoScreen() {
     return selectedPhotos.some(photo => photo.id === item.id);
   };
 
+  const handleToggleSelectAll = () => {
+    if (selectAll) {
+      setSelectedPhotos([]);
+    } else {
+      setSelectedPhotos(photoFiles.map(photo => photo.id));
+    }
+    setSelectAll(!selectAll);
+  };
+
+  const handleCloseViewer = () => {
+    setViewingPhotoIndex(null);
+  };
+
+  const renderItem = ({ item, index }) => {
+    return (
+      <View style={styles.itemContainer}>
+        <TouchableOpacity style={styles.thumbnailContainer} onPress={() => handlePhotoPress(index)}>
+          <Image source={{ uri: item.uri }} style={styles.thumbnail} />
+        </TouchableOpacity>
+        <View style={styles.checkboxContainer}>
+          <Checkbox
+            value={selectedPhotos.includes(item)}
+            style={{ borderRadius: 50, borderColor: "rgb(211, 211, 211)" }}
+            onValueChange={() => handleSelectPhoto(item)}
+          />
+        </View>
+      </View>
+    );
+  };
+
+  const filteredPhotoFiles = photoFiles.filter(file =>
+    file.filename.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const ShuffleButtonComponent = () => {
-    const navigation = useNavigation()
+    const navigation = useNavigation();
     const [showPopUp, setShowPopUp] = useState(false);
 
     const handleShufflePress = () => {
@@ -74,46 +112,33 @@ export default function PhotoScreen() {
     };
 
     const handleSendOnPress = () => {
-      if (selectedPhotos.length == 0) {
-        navigation.navigate("SendRequestScreen")
+      if (selectedPhotos.length === 0) {
+        navigation.navigate("SendRequestScreen");
       }
-      console.log(selectedPhotos)
+      console.log(selectedPhotos);
       for (var file of selectedPhotos) {
         setSending(true)
         setFilename(file.filename)
         handleShare(file, getImageType)
-        .then(() => {
-          setSending(false)
-          Alert.alert(`${file.filename} sent`)
-        })
-        .catch(() => {
-          setSending(false)
-          Alert.alert("File sharing failed")
-        })
+          .then(() => {
+            setSending(false)
+            Alert.alert(`${file.filename} sent`)
+          })
+          .catch(() => {
+            setSending(false)
+            Alert.alert("File sharing failed")
+          })
       }
-      console.log("sending")
-    }
+      console.log("sending");
+    };
 
     return (
       <View>
-      <View style={styles.shuffleButtonContainer}>
-        <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
-          <AntDesign name="swap" size={32} color="white" />
-        </TouchableOpacity>
-      </View>
-
-      {/* {showPopUp && (
-        <View style={styles.popUpContainer}>
-          <TouchableOpacity style={styles.popUpButton} onPress={handleSendOnPress}>
-            <AntDesign name="upload" size={24} color="white" />
-            <Text style={styles.popUpText}>Send</Text>
+        <View style={styles.shuffleButtonContainer}>
+          <TouchableOpacity style={styles.shuffleButton} onPress={handleShufflePress}>
+            <AntDesign name="swap" size={32} color="white" />
           </TouchableOpacity>
-          <View style={styles.spaceBetweenButtons} />
-          <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("ReceiveScreen")}>
-            <AntDesign name="download" size={24} color="white" />
-            <Text style={styles.popUpText}>Receive</Text>
-          </TouchableOpacity>
-        </View> */}
+        </View>
 
         {showPopUp && (
           <View style={styles.popUpContainer}>
@@ -129,46 +154,11 @@ export default function PhotoScreen() {
           </View>
         )}
       </View>
-    )
-  }
-
-  const handleToggleSelectAll = () => {
-    if (selectAll) {
-      setSelectedPhotos([]);
-    } else {
-      setSelectedPhotos(photoFiles.map(photo => photo.id));
-    }
-    setSelectAll(!selectAll);
-  };
-
-  const renderItem = ({ item }) => {
-    const fileSizeMB = item.width && item.height ? `${item.width}x${item.height}` : 'Unknown';
-
-    return (
-      <View style={styles.itemContainer}>
-        <TouchableOpacity style={styles.thumbnailContainer} onPress={() => handlePhotoPress(item.uri)}>
-          <Image source={{ uri: item.uri }} style={styles.thumbnail} />
-          
-        </TouchableOpacity>
-        <View style={styles.checkboxContainer}>
-          <Checkbox
-            value={selectedPhotos.includes(item)}
-            style = {{borderRadius: 50, borderColor:"rgb(211, 211, 211)"}}
-            onValueChange={() => handleSelectPhoto(item)}
-          />
-        </View>
-      </View>
     );
   };
 
-  const filteredPhotoFiles = photoFiles.filter(file =>
-    file.filename.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
-    <ImageBackground
-      style={styles.backgroundImage}
-    >
+    <ImageBackground style={styles.backgroundImage}>
       <View style={styles.container}>
         <View style={styles.header}>
           <Image source={require('../../assets/logo.png')} style={styles.logo} />
@@ -197,13 +187,20 @@ export default function PhotoScreen() {
           numColumns={2} // Set the number of columns for the grid
           columnWrapperStyle={styles.columnWrapper} // Optional styling for columns
         />
-        {viewingPhoto && (
-          <View {...panResponder.current.panHandlers} style={styles.photoViewerContainer}>
-            <Image
-              source={{ uri: viewingPhoto }}
-              resizeMode="contain"
-              style={styles.photoViewer}
-            />
+        {viewingPhotoIndex !== null && (
+          <View style={styles.photoViewerOverlay}>
+            <TouchableOpacity style={styles.photoViewerOverlay} onPress={handleCloseViewer} />
+            <View style={styles.photoViewerContainer}>
+              <TouchableOpacity style={styles.backButton} onPress={handleCloseViewer}>
+                <Feather name="x" size={24} color="white" />
+              </TouchableOpacity>
+              <Image
+                source={{ uri: photoFiles[viewingPhotoIndex].uri }}
+                resizeMode="contain"
+                style={styles.photoViewer}
+                {...panResponder.current.panHandlers}
+              />
+            </View>
           </View>
         )}
       </View>
@@ -211,15 +208,15 @@ export default function PhotoScreen() {
 
 
       <Modal visible={sending} transparent animationType="fade">
-      <BlurView intensity={90} tint="light" style={styles.blurContainer}>
-      <View style={styles.modalContainer}>
-        {/* <GeneralLoader /> */}
-        {/* <ReceiveLoader /> */}
-          <ActivityIndicator size={60} color="#004d40" />
-          <Text style={styles.text}>Sending...</Text>
-          <Text style={styles.text}>{filename}</Text>
-        </View>
-      </BlurView>
+        <BlurView intensity={90} tint="light" style={styles.blurContainer}>
+          <View style={styles.modalContainer}>
+            {/* <GeneralLoader /> */}
+            {/* <ReceiveLoader /> */}
+            <ActivityIndicator size={60} color="#004d40" />
+            <Text style={styles.text}>Sending...</Text>
+            <Text style={styles.text}>{filename}</Text>
+          </View>
+        </BlurView>
       </Modal>
 
     </ImageBackground>
@@ -239,15 +236,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 35,
-    padding: 15,
     shadowColor: 'green',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     borderRadius: 40,
+    padding: 15,
     backgroundColor: 'white', // Make header transparent to see background image
     elevation: 5,
   },
+
   logo: {
     width: 40,
     height: 40,
@@ -264,10 +262,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 10,
-    backgroundColor: 'white',
+    // backgroundColor: 'green',
     borderBottomWidth: 9,
     borderBottomColor: '#fffff',
-    marginTop:15,
+    marginTop: 15,
+
   },
   selectButton: {
     flexDirection: 'row',
@@ -292,7 +291,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     margin: 10,
-    position: 'relative', // For positioning the radio button within the thumbnail
+    position: 'relative',
   },
   thumbnailContainer: {
     width: '100%',
@@ -304,13 +303,11 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: '#d9d9d9',
   },
-
-  checkboxContainer:{
+  checkboxContainer: {
     position: 'absolute',
     top: 5,
     right: 5,
   },
-
   details: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -337,7 +334,7 @@ const styles = StyleSheet.create({
   columnWrapper: {
     justifyContent: 'space-between',
   },
-  photoViewerContainer: {
+  photoViewerOverlay: {
     position: 'absolute',
     top: 0,
     left: 0,
@@ -346,6 +343,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  photoViewerContainer: {
+    width: '90%',
+    height: '90%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
   },
   photoViewer: {
     width: '100%',
@@ -373,7 +377,7 @@ const styles = StyleSheet.create({
   },
   popUpButton: {
     backgroundColor: '#004d40',
-    padding: 8,// Navigate to SendRequestScreen
+    padding: 8,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',

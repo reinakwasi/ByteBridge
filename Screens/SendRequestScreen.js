@@ -31,7 +31,7 @@ const SendRequestScreen = () => {
 
         // const SHARE_SERVER_URL = `${WEBSOCKET_URL}/ws/socket-server/${share_channel_id}/`
             // testing url
-        const SHARE_SERVER_URL = `${WEBSOCKET_URL}/ws/socket-server/233/`
+        const SHARE_SERVER_URL = `${WEBSOCKET_URL}/ws/socket-server/${share_channel_id}/`
         console.log(SHARE_SERVER_URL)
         setQRValue(SHARE_SERVER_URL); 
 

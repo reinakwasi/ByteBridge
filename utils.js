@@ -74,7 +74,7 @@ export const handleShare = async (file, fileType) => {
         type: fileType(file.filename),
         name: file.filename,
       });
-      formData.append('share_channel_id', 233)
+      formData.append('share_channel_id', share_channel_id)
   
       const response = await axios.post(shareEndpoint, formData, {
         headers: {
