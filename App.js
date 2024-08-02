@@ -18,6 +18,7 @@ import SignupScreen from './Screens/components/SignUpScreen';
 import VerificationScreen from './Screens/components/VerificationScreen';
 import ForgotPasswordScreen from './Screens/components/ForgotPasswordScreen';
 import ViewCloudDataScreen from './Screens/components/ViewCloudDataScreen';
+import SplashScreen from './Screens/components/SplashScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -40,8 +41,8 @@ const MainTapNavigator = () => {
           let iconName;
           const size = 33
           switch (route.name) {
-            case 'History':
-              iconName = 'history'
+            case 'Cloud':
+              iconName = 'cloud'
               break;
             case 'Photo':
               iconName = 'photo';
@@ -73,7 +74,7 @@ const MainTapNavigator = () => {
       <Tab.Screen name="Video" component={VideoScreen} />
       <Tab.Screen name="Audio" component={AudioScreen} />
       <Tab.Screen name="Document" component={DocumentScreen} />
-      <Tab.Screen name="History" component={HistoryScreen} />
+      <Tab.Screen name="Cloud" component={CloudScreen} />
     </Tab.Navigator>
   )
 }
@@ -84,13 +85,19 @@ const MainStackNavigator = () => {
     <NavigationContainer>
       <Stack.Navigator>
 
-
+        {/* <Stack.Screen
+          options={{
+            headerShown: false
+          }}
+          name='SplashScreen'
+          component={SplashScreen}
+        /> */}
 
         <Stack.Screen
           options={{
             headerShown: false
           }}
-          name='MainTapNavigtor'
+          name='MainTapNavigator'
           component={MainTapNavigator}
         />
 

@@ -7,7 +7,7 @@ const CloudWelcome = (props) => {
       <View style={{alignItems: "center"}}>
       <LottieView
         style={styles.lottieIndicator}
-        source={require('../assets/cloudLoading.json')}
+        source={require('../assets/ll.json')}
         autoPlay
         loop
         speed={2}

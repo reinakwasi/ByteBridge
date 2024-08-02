@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, FlatList, Image, TextInput, StyleSheet, TouchableOpacity, ImageBackground, PanResponder, Animated } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, Modal, Alert, Image, TextInput, StyleSheet, TouchableOpacity, ImageBackground, PanResponder, Animated } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { Video } from 'expo-av';
@@ -8,13 +8,16 @@ import { getVideoType } from '../../utils';
 import { AntDesign } from '@expo/vector-icons';
 import ProfileButton from '../../components/ProfileComponent';
 import { handleShare } from '../../utils';
+import { BlurView } from 'expo-blur';
 import Checkbox from 'expo-checkbox';
 
 export default function VideoScreen() {
   const [videoFiles, setVideoFiles] = useState([]);
+  const [sending, setSending] = useState(false)
   const [searchQuery, setSearchQuery] = useState('');
   const [playingUri, setPlayingUri] = useState(null);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [filename, setFilename] = useState("")
   const videoRef = useRef(null);
   const [selectAll, setSelectAll] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
@@ -30,14 +33,23 @@ export default function VideoScreen() {
     };
 
     const handleSendOnPress = () => {
-      if (selectedFiles.length === 0){
-        navigation.navigate("SendRequestScreen");
+      if (selectedFiles.length == 0) {
+        navigation.navigate("SendRequestScreen")
       }
-      console.log(selectedFiles);
-      for (var file of selectedFiles){
-        handleShare(file, getVideoType);
+      for (var file of selectedFiles) {
+        setSending(true)
+        setFilename(file.filename)
+        handleShare(file, getAudioType)
+          .then(() => {
+            setSending(false)
+            Alert.alert(`${file.filename} sent`)
+          })
+          .catch(() => {
+            setSending(false)
+            Alert.alert("File sharing failed")
+          })
       }
-      console.log("sending");
+      console.log("sending")
     }
 
     return (
@@ -50,12 +62,12 @@ export default function VideoScreen() {
         {showPopUp && (
           <View style={styles.popUpContainer}>
             <TouchableOpacity style={styles.popUpButton} onPress={handleSendOnPress}>
-              <AntDesign name="upload" size={24} color="black" />
+              <AntDesign name="upload" size={24} color="white" />
               <Text style={styles.popUpText}>Send</Text>
             </TouchableOpacity>
             <View style={styles.spaceBetweenButtons} />
             <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("ReceiveScreen")}>
-              <AntDesign name="download" size={24} color="black" />
+              <AntDesign name="download" size={24} color="white" />
               <Text style={styles.popUpText}>Receive</Text>
             </TouchableOpacity>
           </View>
@@ -218,6 +230,18 @@ export default function VideoScreen() {
         )}
       </View>
       <ShuffleButtonComponent />
+
+      <Modal visible={sending} transparent animationType="fade">
+        <BlurView intensity={90} tint="light" style={styles.blurContainer}>
+          <View style={styles.modalContainer}>
+            {/* <GeneralLoader /> */}
+            {/* <ReceiveLoader /> */}
+            <ActivityIndicator size={60} color="#004d40" />
+            <Text style={styles.text}>Sending...</Text>
+            <Text style={styles.text}>{filename}</Text>
+          </View>
+        </BlurView>
+      </Modal>
     </ImageBackground>
   );
 }
@@ -389,5 +413,29 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
     borderRadius: 50,
     padding: 10,
+  },
+
+  blurContainer: {
+    flex: 1,
+    padding: 20,
+    margin: 16,
+    textAlign: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    borderRadius: 20,
+  },
+
+  text: {
+    marginTop: 130,
+    fontSize: 24,
+    color: "#004d40",
+    fontWeight: '600',
+  },
+
+  modalContainer: {
+    flex: 1,
+    // backgroundColor: "red",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

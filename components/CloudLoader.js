@@ -1,13 +1,14 @@
 import { View, StyleSheet, Text } from 'react-native'
-import LottieView from 'lottie-react-native'
+// import LottieView from 'lottie-react-native'
+import Lottie from 'lottie-react-native';
 
 const CloudLoader = (props) => {
     const { message } = props
     return (
       <View style={{alignItems: "center"}}>
-      <LottieView
+      <Lottie
         style={styles.lottieIndicator}
-        source={require('../assets/cloudLoading.json')}
+        source={require('../assets/ll.json')}
         autoPlay
         loop
         speed={2}

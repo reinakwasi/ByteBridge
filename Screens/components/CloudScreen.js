@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, Modal, TouchableOpacity, Linking, Pressable } from 'react-native';
+import { View, Text, FlatList, Dimensions, Image, StyleSheet, Modal, TouchableOpacity, Linking, Pressable } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,6 +18,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
 import ProfileButton from '../../components/ProfileComponent';
 import { handleShare } from '../../utils';
+// import { Video } from 'expo-av';
+const { width, height } = Dimensions.get('window');
 
 const CloudScreen = () => {
   const [userData, setUserData] = useState(null);
@@ -215,15 +217,36 @@ const CloudScreen = () => {
 
   if (showCloudWelcome) {
     return (
+      // <View style={styles.welcomeContainer}>
+
+      //   <CloudWelcome />
+      //   {/* <Image source={require('../../assets/cloud.jpg')} style={styles.logo} /> */}
+      //   <WelcomeButton
+      //     message={"Start Your Cloud Storage"}
+      //     onPress={() => navigation.navigate("SignupScreen")}
+      //   />
+
+      // </View>
       <View style={styles.welcomeContainer}>
-        <StatusBar style="auto" />
-        <Text style={styles.welcomeText}>Welcome To ByteBridge Cloud Services</Text>
-        <CloudWelcome />
-        <WelcomeButton
-          message={"Start Your Cloud Storage"}
-          onPress={() => navigation.navigate("SignupScreen")}
+        {/* Video Background */}
+        <Video
+          source={{ uri: 'https://videos.pexels.com/video-files/946147/946147-hd_1920_1080_30fps.mp4' }} // Replace with your video URL
+          style={styles.backgroundVideo}
+          resizeMode="cover"
+          shouldPlay
+          isLooping
+          isMuted
         />
 
+        {/* Content */}
+        <View style={styles.overlay}>
+          <StatusBar style="auto" />
+          <Text style={styles.welcomeText}>Welcome To ByteBridge Cloud Services</Text>
+          <WelcomeButton
+            message={"Start Your Cloud Storage"}
+            onPress={() => navigation.navigate("SignupScreen")}
+          />
+        </View>
       </View>
     );
   } else if (!fileReady) {
@@ -296,7 +319,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     backgroundColor: "rgb(227, 255, 255)",
   },
-
+  backgroundVideo: {
+    ...StyleSheet.absoluteFillObject,
+    width,
+    height,
+    zIndex: -1,
+  },
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Optional: Adds a dark overlay to make text readable
+    padding: 20,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: "space-between",
@@ -413,6 +452,7 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 28,
     fontWeight: 'bold',
+    color:"white",
     marginBottom: 24,
     textAlign: 'center',
   },

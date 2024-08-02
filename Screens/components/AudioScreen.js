@@ -1,7 +1,6 @@
 
-
 import React, { useEffect, useState } from 'react';
-import { View, Modal, Text, ActivityIndicator, FlatList, Image, TextInput, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Modal, Text, ActivityIndicator, Alert, FlatList, Image, TextInput, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import { Audio } from 'expo-av';
 import * as MediaLibrary from 'expo-media-library';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -36,11 +35,10 @@ export default function AudioScreen() {
     };
 
     const handleSendOnPress = () => {
-      if (selectedPhotos.length == 0) {
+      if (selectedFiles.length == 0) {
         navigation.navigate("SendRequestScreen")
       }
-      console.log(selectedPhotos)
-      for (var file of selectedPhotos) {
+      for (var file of selectedFiles) {
         setSending(true)
         setFilename(file.filename)
         handleShare(file, getAudioType)
@@ -67,12 +65,12 @@ export default function AudioScreen() {
         {showPopUp && (
           <View style={styles.popUpContainer}>
             <TouchableOpacity style={styles.popUpButton} onPress={handleSendOnPress}>
-              <AntDesign name="upload" size={24} color="black" />
+              <AntDesign name="upload" size={24} color="white" />
               <Text style={styles.popUpText}>Send</Text>
             </TouchableOpacity>
             <View style={styles.spaceBetweenButtons} />
             <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("ReceiveScreen")}>
-              <AntDesign name="download" size={24} color="black" />
+              <AntDesign name="download" size={24} color="white" />
               <Text style={styles.popUpText}>Receive</Text>
             </TouchableOpacity>
           </View>
@@ -174,12 +172,12 @@ export default function AudioScreen() {
         <View style={styles.container}>
           <View style={styles.header}>
             <Image source={require('../../assets/logo.png')} style={styles.logo} />
-            <TextInput
+            {/* <TextInput
               style={styles.searchBar}
               placeholder="Search audio"
               value={searchQuery}
               onChangeText={setSearchQuery}
-            />
+            /> */}
             <ProfileButton />
           </View>
           <View style={styles.selectAllContainer}>
@@ -354,5 +352,29 @@ const styles = StyleSheet.create({
   spaceBetweenButtons: {
     width: 30,
     marginEnd: 10,
+  },
+
+  blurContainer: {
+    flex: 1,
+    padding: 20,
+    margin: 16,
+    textAlign: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    borderRadius: 20,
+  },
+
+  text: {
+    marginTop: 130,
+    fontSize: 24,
+    color: "#004d40",
+    fontWeight: '600',
+  },
+
+  modalContainer: {
+    flex: 1,
+    // backgroundColor: "red",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

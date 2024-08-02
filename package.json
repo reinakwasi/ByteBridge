@@ -28,6 +28,7 @@
     "expo-application": "~5.9.1",
     "expo-av": "~14.0.6",
     "expo-barcode-scanner": "^13.0.1",
+    "expo-blur": "~13.0.2",
     "expo-camera": "^15.0.13",
     "expo-checkbox": "~3.0.0",
     "expo-device": "~6.0.2",
@@ -39,7 +40,6 @@
     "expo-permissions": "^14.4.0",
     "expo-sharing": "^12.0.1",
     "expo-status-bar": "~1.12.1",
-    "lottie-react-native": "6.7.0",
     "node-fetch": "^3.3.2",
     "pod": "^0.9.0",
     "react": "18.2.0",
@@ -64,10 +64,10 @@
     "react-native-share": "^10.2.1",
     "react-native-svg": "15.2.0",
     "react-native-vector-icons": "^10.1.0",
+    "react-native-webview": "13.8.6",
     "react-navigation": "^5.0.0",
     "typescript": "~5.3.3",
-    "expo-blur": "~13.0.2",
-    "react-native-webview": "13.8.6"
+    "lottie-react-native": "6.7.2"
   },
   "devDependencies": {
     "@babel/core": "^7.24.0",

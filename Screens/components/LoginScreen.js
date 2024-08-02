@@ -45,7 +45,7 @@ const LoginScreen = ({ navigation }) => {
         access_token = res.data['access']
         storage.setItem('token', access_token)
         console.log(res.data)
-        navigation.navigate('CloudScreen', { access_token: access_token })
+        navigation.navigate('CloudScreen')
       })
       .catch((err) => {
         setLoading(false) 

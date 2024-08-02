@@ -143,12 +143,12 @@ export default function PhotoScreen() {
         {showPopUp && (
           <View style={styles.popUpContainer}>
             <TouchableOpacity style={styles.popUpButton} onPress={handleSendOnPress}>
-              <AntDesign name="upload" size={24} color="black" />
+              <AntDesign name="upload" size={24} color="white" />
               <Text style={styles.popUpText}>Send</Text>
             </TouchableOpacity>
             <View style={styles.spaceBetweenButtons} />
             <TouchableOpacity style={styles.popUpButton} onPress={() => navigation.navigate("ReceiveScreen")}>
-              <AntDesign name="download" size={24} color="black" />
+              <AntDesign name="download" size={24} color="white" />
               <Text style={styles.popUpText}>Receive</Text>
             </TouchableOpacity>
           </View>
