@@ -8,8 +8,7 @@
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash2.jpg",
-      "resizeMode": "contain"
-      
+      "resizeMode": "cover"
     },
     "ios": {
       "supportsTablet": true
@@ -23,6 +22,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4242c508-c543-4275-aedd-aa0dc564850b"
+      }
     }
   }
 }
